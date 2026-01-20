@@ -1,0 +1,58 @@
+﻿@page "/catalog_пользователи_ut"
+@using Emploees.Application
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Emploees.Domain
+@using Emploees.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Пользователи УТ</PageTitle>
+
+<h3>Пользователи УТ</h3>
+
+<QuickGrid Class="table" ItemsProvider="itemsProvider">
+	<PropertyColumn Title="Пользователь" Sortable="true"
+					Property="item => item.Пользователь == null ? string.Empty : item.Пользователь.Description" />
+	<PropertyColumn Title="СхемаПредприятия" Sortable="true"
+					Property="item => item.СхемаПредприятия == null ? string.Empty : item.СхемаПредприятия.Description" />
+</QuickGrid>
+
+@code {
+	private QuickGrid<Пользователь_СхемаПредприятия>? catalogGrid;
+	private ApplicationDbContext context = default!;
+	GridItemsProvider<Пользователь_СхемаПредприятия>? itemsProvider;
+
+	protected override async Task OnInitializedAsync()
+	{
+		context = DbFactory.CreateDbContext();
+
+		itemsProvider = async request =>
+	   {
+		   var query = context.Пользователь_СхемаПредприятия.AsNoTracking();
+
+		   //request.ApplySorting(query);
+		   if (request.SortByColumn != null)
+		   {
+			   var sortExpression = ((PropertyColumn<Пользователь_СхемаПредприятия, string>)request.SortByColumn)?.Property;
+			   if (sortExpression != null)
+			   {
+				   if (request.SortByAscending)
+					   query = query.OrderBy(sortExpression);
+				   else
+					   query = query.OrderByDescending(sortExpression);
+			   }
+		   }
+
+		   var result = await query
+		.Include(e => e.СхемаПредприятия)
+		.Include(e => e.Пользователь).ToListAsync();
+
+		   var response = GridItemsProviderResult.From(items: result, totalItemCount: result.Count);
+
+		   return response;
+	   };
+	}
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

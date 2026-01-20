@@ -1,0 +1,61 @@
+﻿@page "/catalog_сотрудники_zup/create"
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Domain
+@inject IDbContextFactory<Emploees.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Catalog_Сотрудники_Zup</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Catalog_Сотрудники_Zup" OnValidSubmit="AddCatalog_Сотрудники_Zup" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="code" class="form-label">Code:</label> 
+                <InputText id="code" @bind-Value="Catalog_Сотрудники_Zup.Code" class="form-control" /> 
+                <ValidationMessage For="() => Catalog_Сотрудники_Zup.Code" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="Catalog_Сотрудники_Zup.Description" class="form-control" /> 
+                <ValidationMessage For="() => Catalog_Сотрудники_Zup.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="deletionmark" class="form-label">DeletionMark:</label> 
+                <InputCheckbox id="deletionmark" @bind-Value="Catalog_Сотрудники_Zup.DeletionMark" class="form-check-input" /> 
+                <ValidationMessage For="() => Catalog_Сотрудники_Zup.DeletionMark" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="вархиве" class="form-label">ВАрхиве:</label> 
+                <InputCheckbox id="вархиве" @bind-Value="Catalog_Сотрудники_Zup.ВАрхиве" class="form-check-input" /> 
+                <ValidationMessage For="() => Catalog_Сотрудники_Zup.ВАрхиве" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/catalog_сотрудники_zups">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Catalog_Сотрудники_Zup Catalog_Сотрудники_Zup { get; set; } = default!;
+
+    protected override void OnInitialized() => Catalog_Сотрудники_Zup ??= new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddCatalog_Сотрудники_Zup()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Catalog_Сотрудники_Zup.Add(Catalog_Сотрудники_Zup);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/catalog_сотрудники_zups");
+    }
+}

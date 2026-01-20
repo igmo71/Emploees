@@ -1,0 +1,44 @@
+﻿@page "/ad-users"
+@using Emploees.Application
+@using Emploees.Domain
+@inject IAdUserService AdService
+
+<h3>AD Users</h3>
+
+@if (adUsers is not null)
+{
+	<table class="table">
+		<tr>
+			<td>Name</td>
+			<td>Login</td>
+			<td>Title</td>
+			<td>Department</td>
+			@* <td>Sid</td> *@
+			@* <td>Manager</td> *@
+			<td>Enabled</td>
+			<td>DistinguishedName</td>
+		</tr>
+		@foreach (var item in adUsers)
+		{
+			<tr>
+				<td>@item.Name</td>
+				<td>@item.Login</td>
+				<td>@item.Title</td>
+				<td>@item.Department</td>
+				@* <td>@item.Sid</td> *@
+				@* <td>@item.Manager</td> *@
+				<td>@item.Enabled</td>
+				<td>@item.DistinguishedName</td>
+			</tr>
+		}
+	</table>
+}
+
+@code {
+	private AdUser[]? adUsers;
+
+	protected async override Task OnInitializedAsync()
+	{
+		adUsers = await AdService.LoadAdUsersAsync();
+	}
+}

@@ -1,0 +1,52 @@
+﻿@page "/catalog_сотрудники_zup/details"
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Domain
+@inject IDbContextFactory<Emploees.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Catalog_Сотрудники_Zup</h2>
+    <hr />
+    @if (catalog_сотрудники_zup is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Code</dt>
+            <dd class="col-sm-10">@catalog_сотрудники_zup.Code</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@catalog_сотрудники_zup.Description</dd>
+            <dt class="col-sm-2">DeletionMark</dt>
+            <dd class="col-sm-10">@catalog_сотрудники_zup.DeletionMark</dd>
+            <dt class="col-sm-2">ВАрхиве</dt>
+            <dd class="col-sm-10">@catalog_сотрудники_zup.ВАрхиве</dd>
+        </dl>
+        <div>
+            <a href="@($"/catalog_сотрудники_zups/edit?ref_key={catalog_сотрудники_zup.Ref_Key}")">Edit</a> |
+            <a href="@($"/catalog_сотрудники_zups")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Catalog_Сотрудники_Zup? catalog_сотрудники_zup;
+
+    [SupplyParameterFromQuery]
+    private string Ref_Key { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        catalog_сотрудники_zup = await context.Catalog_Сотрудники_Zup.FirstOrDefaultAsync(m => m.Ref_Key == Ref_Key);
+
+        if (catalog_сотрудники_zup is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+}

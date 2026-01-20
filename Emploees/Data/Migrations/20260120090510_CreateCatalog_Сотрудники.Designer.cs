@@ -4,6 +4,7 @@ using Emploees.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Emploees.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260120090510_CreateCatalog_Сотрудники")]
+    partial class CreateCatalog_Сотрудники
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,49 +91,6 @@ namespace Emploees.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Emploees.Domain.Catalog_Пользователи", b =>
-                {
-                    b.Property<string>("Ref_Key")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<bool>("DeletionMark")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.HasKey("Ref_Key");
-
-                    b.ToTable("Catalog_Пользователи", (string)null);
-                });
-
-            modelBuilder.Entity("Emploees.Domain.Catalog_Сотрудники_Buh", b =>
-                {
-                    b.Property<string>("Ref_Key")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<string>("Code")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<bool>("DeletionMark")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<bool>("ВАрхиве")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Ref_Key");
-
-                    b.ToTable("Catalog_Сотрудники_Buh");
-                });
-
             modelBuilder.Entity("Emploees.Domain.Catalog_Сотрудники_Zup", b =>
                 {
                     b.Property<string>("Ref_Key")
@@ -154,47 +114,6 @@ namespace Emploees.Migrations
                     b.HasKey("Ref_Key");
 
                     b.ToTable("Catalog_Сотрудники_Zup");
-                });
-
-            modelBuilder.Entity("Emploees.Domain.Catalog_СхемаПредприятия", b =>
-                {
-                    b.Property<string>("Ref_Key")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<bool>("DeletionMark")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Parent_Key")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.HasKey("Ref_Key");
-
-                    b.ToTable("Catalog_СхемаПредприятия", (string)null);
-                });
-
-            modelBuilder.Entity("Emploees.Domain.Пользователь_СхемаПредприятия", b =>
-                {
-                    b.Property<string>("Пользователь_Key")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.Property<string>("СхемаПредприятия_Key")
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
-                    b.HasKey("Пользователь_Key");
-
-                    b.HasIndex("СхемаПредприятия_Key")
-                        .IsUnique()
-                        .HasFilter("[СхемаПредприятия_Key] IS NOT NULL");
-
-                    b.ToTable("Пользователь_СхемаПредприятия", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -349,23 +268,6 @@ namespace Emploees.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Emploees.Domain.Пользователь_СхемаПредприятия", b =>
-                {
-                    b.HasOne("Emploees.Domain.Catalog_Пользователи", "Пользователь")
-                        .WithOne()
-                        .HasForeignKey("Emploees.Domain.Пользователь_СхемаПредприятия", "Пользователь_Key")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Emploees.Domain.Catalog_СхемаПредприятия", "СхемаПредприятия")
-                        .WithOne()
-                        .HasForeignKey("Emploees.Domain.Пользователь_СхемаПредприятия", "СхемаПредприятия_Key");
-
-                    b.Navigation("Пользователь");
-
-                    b.Navigation("СхемаПредприятия");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

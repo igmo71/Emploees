@@ -1,0 +1,43 @@
+﻿@page "/catalog_сотрудники_buh"
+@using Emploees.Application
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Emploees.Domain
+@using Emploees.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject IBuhService BuhService
+
+<PageTitle>Сотрудники Бух</PageTitle>
+
+<h1>Сотрудники Бух (@(context.Catalog_Сотрудники_Buh.Count()))</h1>
+
+<button class="btn btn-primary" type="button" @onclick="RefreshCatalog">Обновить данные из 1С Бух</button>
+
+<QuickGrid Class="table" Items="context.Catalog_Сотрудники_Buh" @ref="catalogGrid">
+	<PropertyColumn Property="item => item.Code" />
+	<PropertyColumn Property="item => item.Description" />
+	<PropertyColumn Property="item => item.DeletionMark" />
+	<PropertyColumn Property="item => item.ВАрхиве" />
+</QuickGrid>
+
+@code {
+	private QuickGrid<Catalog_Сотрудники_Buh>? catalogGrid;
+	private ApplicationDbContext context = default!;
+
+	protected override async Task OnInitializedAsync()
+	{
+		context = DbFactory.CreateDbContext();
+	}
+
+	private async Task RefreshCatalog(MouseEventArgs args)
+	{
+		await BuhService.RefreshCatalog();
+
+		if (catalogGrid is not null)
+			await catalogGrid.RefreshDataAsync();
+	}
+
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

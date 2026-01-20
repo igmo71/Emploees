@@ -1,0 +1,104 @@
+﻿@page "/catalog_сотрудники_zup/edit"
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Domain
+@inject IDbContextFactory<Emploees.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Catalog_Сотрудники_Zup</h2>
+<hr />
+@if (Catalog_Сотрудники_Zup is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Catalog_Сотрудники_Zup" OnValidSubmit="UpdateCatalog_Сотрудники_Zup" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Catalog_Сотрудники_Zup.Ref_Key" value="@Catalog_Сотрудники_Zup.Ref_Key" />
+                <div class="mb-3">
+                    <label for="code" class="form-label">Code:</label>
+                    <InputText id="code" @bind-Value="Catalog_Сотрудники_Zup.Code" class="form-control" />
+                    <ValidationMessage For="() => Catalog_Сотрудники_Zup.Code" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Catalog_Сотрудники_Zup.Description" class="form-control" />
+                    <ValidationMessage For="() => Catalog_Сотрудники_Zup.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="deletionmark" class="form-label">DeletionMark:</label>
+                    <InputCheckbox id="deletionmark" @bind-Value="Catalog_Сотрудники_Zup.DeletionMark" class="form-check-input" />
+                    <ValidationMessage For="() => Catalog_Сотрудники_Zup.DeletionMark" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="вархиве" class="form-label">ВАрхиве:</label>
+                    <InputCheckbox id="вархиве" @bind-Value="Catalog_Сотрудники_Zup.ВАрхиве" class="form-check-input" />
+                    <ValidationMessage For="() => Catalog_Сотрудники_Zup.ВАрхиве" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/catalog_сотрудники_zups">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string Ref_Key { get; set; }
+
+    [SupplyParameterFromForm]
+    private Catalog_Сотрудники_Zup? Catalog_Сотрудники_Zup { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Catalog_Сотрудники_Zup ??= await context.Catalog_Сотрудники_Zup.FirstOrDefaultAsync(m => m.Ref_Key == Ref_Key);
+
+        if (Catalog_Сотрудники_Zup is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateCatalog_Сотрудники_Zup()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Catalog_Сотрудники_Zup!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!Catalog_Сотрудники_ZupExists(Catalog_Сотрудники_Zup!.Ref_Key))
+            {
+                NavigationManager.NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/catalog_сотрудники_zups");
+    }
+
+    private bool Catalog_Сотрудники_ZupExists(string ref_key)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Catalog_Сотрудники_Zup.Any(e => e.Ref_Key == ref_key);
+    }
+}
