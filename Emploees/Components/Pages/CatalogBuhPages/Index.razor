@@ -27,10 +27,10 @@
 </button>
 
 <QuickGrid Class="table" Items="context.Catalog_Сотрудники_Buh" @ref="catalogGrid">
-	<PropertyColumn Property="item => item.Code" />
-	<PropertyColumn Property="item => item.Description" />
-	<PropertyColumn Property="item => item.DeletionMark" />
-	<PropertyColumn Property="item => item.ВАрхиве" />
+	<Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="item => item.Code" />
+	<Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="item => item.Description" />
+	<Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="item => item.DeletionMark" />
+	<Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="item => item.ВАрхиве" />
 </QuickGrid>
 
 @code {

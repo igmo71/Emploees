@@ -14,13 +14,13 @@
 </p>
 
 <QuickGrid Class="table" Items="context.Emploees">
-    <PropertyColumn Property="entity => entity.Name" Title="ФИО" />
+    <Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Property="entity => entity.Name" Title="ФИО" />
 
-    <TemplateColumn Context="entity">
+    <Microsoft.AspNetCore.Components.QuickGrid.TemplateColumn Context="entity">
         <a href="@($"emploees/edit?id={entity.Id}")">Изменить</a> |
         <a href="@($"emploees/details?id={entity.Id}")">Детали</a> |
         <a href="@($"emploees/delete?id={entity.Id}")">Удалить</a>
-    </TemplateColumn>
+    </Microsoft.AspNetCore.Components.QuickGrid.TemplateColumn>
 </QuickGrid>
 
 @code {

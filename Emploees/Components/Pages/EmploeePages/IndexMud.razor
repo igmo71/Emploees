@@ -1,0 +1,54 @@
+﻿@page "/emploees-mud"
+@using Emploees.Data
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@implements IAsyncDisposable
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Сотрудники</PageTitle>
+
+<h1>Сотрудники (MudBlazor)</h1>
+
+<MudDataGrid Items="@emploees">
+	<Columns>
+		<PropertyColumn Property="x => x.Name" Title="ФИО" />
+		<PropertyColumn Property="x => x.JobTitle == null ? string.Empty : x.JobTitle.Name" Title="Должность" />
+		<PropertyColumn Property="x => x.CostItem == null ? string.Empty : x.CostItem.Name" Title="Статья затрат" />
+		<PropertyColumn Property="x => x.Department == null ? string.Empty : x.Department.Description" Title="Отдел" />
+		<PropertyColumn Property="x => x.City == null ? string.Empty : x.City.Name" Title="Город" />
+		<PropertyColumn Property="x => x.Location == null ? string.Empty : x.Location.Name" Title="Локация" />
+		<PropertyColumn Property="x => x.UserUt == null ? string.Empty : x.UserUt.Description" Title="Пользователь УТ" />
+		<PropertyColumn Property="x => x.EmploeeBuh == null ? string.Empty : x.EmploeeBuh.Description" Title="Сотрудник БП" />
+		<PropertyColumn Property="x => x.EmploeeZup == null ? string.Empty : x.EmploeeZup.Description" Title="Сотрудник ЗУП" />
+		<PropertyColumn Property="x => x.UserAd == null ? string.Empty : x.UserAd.Name" Title="AD User" />
+		<PropertyColumn Property="x => x.OperationManager == null ? string.Empty : x.OperationManager.Name" Title="Оперативный руководитель" />
+		<PropertyColumn Property="x => x.LocationManager == null ? string.Empty : x.LocationManager.Name" Title="Руководитель Локации" />
+	</Columns>
+</MudDataGrid>
+
+
+@code {
+	private ApplicationDbContext context = default!;
+	private List<Emploee> emploees = [];
+
+	protected override void OnInitialized()
+	{
+		context = DbFactory.CreateDbContext();
+
+		emploees = context.Emploees
+			.Include(e => e.City)
+			.Include(e => e.CostItem)
+			.Include(e => e.Department)
+			.Include(e => e.EmploeeBuh)
+			.Include(e => e.EmploeeZup)
+			.Include(e => e.JobTitle)
+			.Include(e => e.Location)
+			.Include(e => e.LocationManager)
+			.Include(e => e.OperationManager)
+			.Include(e => e.UserAd)
+			.Include(e => e.UserUt)
+			.ToList();
+	}
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

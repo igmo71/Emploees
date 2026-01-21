@@ -48,7 +48,7 @@
     [SupplyParameterFromForm]
     private Catalog_Сотрудники_Zup Catalog_Сотрудники_Zup { get; set; } = default!;
 
-    protected override void OnInitialized() => Catalog_Сотрудники_Zup ??= new();
+    protected override void OnInitialized() => Catalog_Сотрудники_Zup ??= new(){Ref_Key = Guid.CreateVersion7().ToString()};
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddCatalog_Сотрудники_Zup()

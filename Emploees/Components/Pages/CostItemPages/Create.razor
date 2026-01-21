@@ -1,0 +1,68 @@
+﻿@page "/cost-item-tree/create"
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Создать</PageTitle>
+
+<h1>Создать</h1>
+
+<h2>Статью Затрат</h2>
+<hr />
+<div class="row">
+	<div class="col-md-4">
+		<EditForm method="post" Model="CostItem" OnValidSubmit="AddEntity" FormName="create" Enhance>
+			<DataAnnotationsValidator />
+			<ValidationSummary class="text-danger" role="alert" />
+			<div class="mb-3">
+				<label for="parentid" class="form-label">@(parent is null ? string.Empty : "Родительская статья:")</label>
+				<input id="parentid" value="@(parent is null ? "Это верхний уровень" : parent?.Name)" class="form-control" disabled />
+			</div>
+			<div class="mb-3">
+				<label for="name" class="form-label">Наименование:</label>
+				<InputText id="name" @bind-Value="CostItem.Name" class="form-control" />
+				<ValidationMessage For="() => CostItem.Name" class="text-danger" />
+			</div>
+			<button type="submit" class="btn btn-primary">Создать</button>
+		</EditForm>
+	</div>
+</div>
+
+<div>
+	<a href="/сcost-item-tree">Назад</a>
+</div>
+
+@code {
+
+	[SupplyParameterFromQuery]
+	public string? ParentId { get; set; }
+
+	[SupplyParameterFromForm]
+	private CostItem CostItem { get; set; } = default!;
+	
+	private ApplicationDbContext context = default!;
+	private CostItem? parent;
+
+	protected override void OnInitialized()
+	{
+		context = DbFactory.CreateDbContext();
+		parent = context.CostItems.FirstOrDefault(e => e.Id == ParentId);
+		CostItem ??= new()
+		{
+			Id = Guid.CreateVersion7().ToString(),
+			ParentId = ParentId
+		};
+	}
+
+	// To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+	private async Task AddEntity()
+	{
+		context.CostItems.Add(CostItem);
+		await context.SaveChangesAsync();
+		NavigationManager.NavigateTo("/cost-item-tree");
+	}
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

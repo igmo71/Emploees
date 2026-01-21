@@ -6,6 +6,7 @@ using Emploees.Infrastucture;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 
 namespace Emploees
 {
@@ -58,6 +59,7 @@ namespace Emploees
             builder.Services.AddAdClient(builder.Configuration);
             builder.Services.AddAdUserService();
 
+            builder.Services.AddMudServices();
 
 
             var app = builder.Build();

@@ -12,9 +12,9 @@
 <h3>Пользователи УТ</h3>
 
 <QuickGrid Class="table" ItemsProvider="itemsProvider">
-	<PropertyColumn Title="Пользователь" Sortable="true"
+	<Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Title="Пользователь" Sortable="true"
 					Property="item => item.Пользователь == null ? string.Empty : item.Пользователь.Description" />
-	<PropertyColumn Title="СхемаПредприятия" Sortable="true"
+	<Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn Title="СхемаПредприятия" Sortable="true"
 					Property="item => item.СхемаПредприятия == null ? string.Empty : item.СхемаПредприятия.Description" />
 </QuickGrid>
 
@@ -33,7 +33,7 @@
 		   //request.ApplySorting(query);
 		   if (request.SortByColumn != null)
 		   {
-			   var sortExpression = ((PropertyColumn<Пользователь_СхемаПредприятия, string>)request.SortByColumn)?.Property;
+			   var sortExpression = ((Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn<Пользователь_СхемаПредприятия, string>)request.SortByColumn)?.Property;
 			   if (sortExpression != null)
 			   {
 				   if (request.SortByAscending)
