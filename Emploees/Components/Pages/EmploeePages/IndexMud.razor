@@ -9,7 +9,7 @@
 
 <h1>Сотрудники (MudBlazor)</h1>
 
-<MudDataGrid Items="@emploees">
+<MudDataGrid @ref="_emploeeGrid" T="Emploee" Items="@emploees" Filterable="true" SortMode="SortMode.Multiple">
 	<Columns>
 		<PropertyColumn Property="x => x.Name" Title="ФИО" />
 		<PropertyColumn Property="x => x.JobTitle == null ? string.Empty : x.JobTitle.Name" Title="Должность" />
@@ -24,12 +24,16 @@
 		<PropertyColumn Property="x => x.OperationManager == null ? string.Empty : x.OperationManager.Name" Title="Оперативный руководитель" />
 		<PropertyColumn Property="x => x.LocationManager == null ? string.Empty : x.LocationManager.Name" Title="Руководитель Локации" />
 	</Columns>
+	<PagerContent>
+		<MudDataGridPager T="Emploee" />
+	</PagerContent>
 </MudDataGrid>
 
 
 @code {
 	private ApplicationDbContext context = default!;
-	private List<Emploee> emploees = [];
+	private List<Emploee> emploees = []; 
+	private MudDataGrid<Emploee> _emploeeGrid = default!;
 
 	protected override void OnInitialized()
 	{
