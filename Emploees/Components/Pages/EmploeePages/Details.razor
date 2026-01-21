@@ -1,0 +1,48 @@
+﻿@page "/emploees/details"
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Детали</PageTitle>
+
+<h1>Детали</h1>
+
+<div>
+    <h2>О Сотруднике</h2>
+    <hr />
+    @if (emploee is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">ФИО</dt>
+            <dd class="col-sm-10">@emploee.Name</dd>
+        </dl>
+        <div>
+            <a href="@($"/emploees/edit?id={emploee.Id}")">Изменить</a> |
+            <a href="@($"/emploees")">Назад</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Emploee? emploee;
+
+    [SupplyParameterFromQuery]
+    private Guid? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        emploee = await context.Emploees.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (emploee is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+}

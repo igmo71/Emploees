@@ -1,0 +1,47 @@
+﻿@page "/emploees/create"
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Создать</PageTitle>
+
+<h1>Создать</h1>
+
+<h2>Сотрудника</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Emploee" OnValidSubmit="AddEntity" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="mb-3">
+                <label for="name" class="form-label">ФИО:</label>
+                <InputText id="name" @bind-Value="Emploee.Name" class="form-control" />
+                <ValidationMessage For="() => Emploee.Name" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/сemploees">Назад</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Emploee Emploee { get; set; } = default!;
+
+    protected override void OnInitialized() => Emploee ??= new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEntity()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Emploees.Add(Emploee);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/emploees");
+    }
+}

@@ -1,0 +1,57 @@
+﻿@page "/emploees/delete"
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Удалить</PageTitle>
+
+<h1>Удалить</h1>
+
+<p>Вы действительно хотите удалить?</p>
+<div>
+    <h2>Сотрудника</h2>
+    <hr />
+    @if (emploee is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">ФИО</dt>
+            <dd class="col-sm-10">@emploee?.Name</dd>
+        </dl>
+        <EditForm method="post" Model="emploee" OnValidSubmit="DeleteEntity" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(emploee is null)">Удалить</button> |
+            <a href="/emploees">Назад</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Emploee? emploee;
+
+    [SupplyParameterFromQuery]
+    private Guid? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        emploee = await context.Emploees.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (emploee is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    private async Task DeleteEntity()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Emploees.Remove(emploee!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/emploees");
+    }
+}

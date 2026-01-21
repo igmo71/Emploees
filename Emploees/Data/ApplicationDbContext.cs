@@ -21,6 +21,8 @@ namespace Emploees.Data
         public DbSet<City> Cities => Set<City>();
         public DbSet<Location> Locations => Set<Location>();
 
+        public DbSet<Emploee> Emploees => Set<Emploee>();
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Catalog_Сотрудники_Zup>().HasKey(e => e.Ref_Key);
@@ -62,6 +64,20 @@ namespace Emploees.Data
             builder.Entity<City>().HasKey(e => e.Id);
 
             builder.Entity<Location>().HasKey(e => e.Id);
+
+
+            builder.Entity<Emploee>().HasKey(e => e.Id);
+            builder.Entity<Emploee>().HasOne(e => e.JobTitle).WithMany().HasForeignKey(e => e.JobTitleId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.CostItem).WithMany().HasForeignKey(e => e.CostItemId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.Department).WithMany().HasForeignKey(e => e.DepartmentId).HasPrincipalKey(e => e.Ref_Key).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.City).WithMany().HasForeignKey(e => e.CityId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.Location).WithMany().HasForeignKey(e => e.LocationId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.UserUt).WithMany().HasForeignKey(e => e.UserUtId).HasPrincipalKey(e => e.Ref_Key).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.UserAd).WithMany().HasForeignKey(e => e.UserAdId).HasPrincipalKey(e => e.Sid).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.EmploeeBuh).WithMany().HasForeignKey(e => e.EmploeeBuhId).HasPrincipalKey(e => e.Ref_Key).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.EmploeeZup).WithMany().HasForeignKey(e => e.EmploeeZupId).HasPrincipalKey(e => e.Ref_Key).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.OperationManager).WithMany().HasForeignKey(e => e.OperationManagerId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Emploee>().HasOne(e => e.LocationManager).WithMany().HasForeignKey(e => e.LocationManagerId).HasPrincipalKey(e => e.Id).OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);
         }
