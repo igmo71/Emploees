@@ -14,7 +14,7 @@
 </p>
 
 <QuickGrid Class="table" Items="context.Emploees">
-    <PropertyColumn Property="entity => entity.Name" Title="Наименование" />
+    <PropertyColumn Property="entity => entity.Name" Title="ФИО" />
 
     <TemplateColumn Context="entity">
         <a href="@($"emploees/edit?id={entity.Id}")">Изменить</a> |
