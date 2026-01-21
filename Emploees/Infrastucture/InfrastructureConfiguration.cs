@@ -59,7 +59,6 @@ namespace Emploees.Infrastucture
             services.AddHttpClient<AdClient>(client =>
             {
                 client.BaseAddress = new Uri(config.BaseAddress);
-                client.DefaultRequestHeaders.Add("Key", config.ApiKey);
             });
 
             return services;
