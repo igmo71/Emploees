@@ -1,7 +1,6 @@
 using Emploees.Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace Emploees.Data
 {
@@ -11,9 +10,11 @@ namespace Emploees.Data
 
         public DbSet<Catalog_Сотрудники_Buh> Catalog_Сотрудники_Buh { get; set; }
 
-        public DbSet<Catalog_Пользователи> Catalog_Пользователиs {  get; set; }
+        public DbSet<Catalog_Пользователи> Catalog_Пользователиs { get; set; }
         public DbSet<Catalog_СхемаПредприятия> Catalog_СхемаПредприятия { get; set; } = default!;
         public DbSet<Пользователь_СхемаПредприятия> Пользователь_СхемаПредприятия { get; set; }
+
+        public DbSet<AdUser> AdUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -46,6 +47,8 @@ namespace Emploees.Data
                 .WithOne()
                 .HasForeignKey<Пользователь_СхемаПредприятия>(e => e.СхемаПредприятия_Key)
                 .HasPrincipalKey<Catalog_СхемаПредприятия>(e => e.Ref_Key);
+
+            builder.Entity<AdUser>().HasKey(e => e.Sid);
 
             base.OnModelCreating(builder);
         }

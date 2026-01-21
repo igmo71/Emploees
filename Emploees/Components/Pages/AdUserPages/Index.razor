@@ -5,18 +5,38 @@
 
 <h3>AD Users</h3>
 
-@if (adUsers is not null)
+<button class="btn btn-primary mb-2" type="button" @onclick="RefreshCatalog">
+	@if (isRefreshing)
+	{
+		<span>Обновляются данные </span>
+		<div class="spinner-border spinner-border-sm" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	}
+	else
+	{
+		<span>Обновить данные из AD</span>
+	}
+</button>
+
+@if (adUsers is null)
+{
+	<div class="spinner-grow" role="status">
+		<span class="visually-hidden">Loading...</span>
+	</div>
+}
+else
 {
 	<table class="table">
 		<tr>
-			<td>Name</td>
-			<td>Login</td>
-			<td>Title</td>
-			<td>Department</td>
-			@* <td>Sid</td> *@
-			@* <td>Manager</td> *@
-			<td>Enabled</td>
-			<td>DistinguishedName</td>
+			<th>Name</th>
+			<th>Login</th>
+			<th>Title</th>
+			<th>Department</th>
+			@* <th>Sid</th> *@
+			@* <th>Manager</th> *@
+			<th>DistinguishedName</th>
+			<th>Enabled</th>
 		</tr>
 		@foreach (var item in adUsers)
 		{
@@ -27,8 +47,8 @@
 				<td>@item.Department</td>
 				@* <td>@item.Sid</td> *@
 				@* <td>@item.Manager</td> *@
-				<td>@item.Enabled</td>
 				<td>@item.DistinguishedName</td>
+				<td>@item.Enabled</td>
 			</tr>
 		}
 	</table>
@@ -36,9 +56,21 @@
 
 @code {
 	private AdUser[]? adUsers;
+	private bool isRefreshing = false;
 
 	protected async override Task OnInitializedAsync()
 	{
-		adUsers = await AdService.LoadAdUsersAsync();
+		adUsers = await AdService.GetAdUsersAsync();
+	}
+
+	private async Task RefreshCatalog(MouseEventArgs args)
+	{
+		isRefreshing = true;
+
+		await AdService.Refresh();
+
+		StateHasChanged();
+
+		isRefreshing = false;
 	}
 }

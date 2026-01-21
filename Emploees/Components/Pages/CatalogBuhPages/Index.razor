@@ -12,7 +12,19 @@
 
 <h1>Сотрудники Бух (@(context.Catalog_Сотрудники_Buh.Count()))</h1>
 
-<button class="btn btn-primary" type="button" @onclick="RefreshCatalog">Обновить данные из 1С Бух</button>
+<button class="btn btn-primary mb-2" type="button" @onclick="RefreshCatalog">
+	@if (isRefreshing)
+	{
+		<span>Обновляются данные </span>
+		<div class="spinner-border spinner-border-sm" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	}
+	else
+	{
+		<span>Обновить данные из 1С Бух</span>
+	}
+</button>
 
 <QuickGrid Class="table" Items="context.Catalog_Сотрудники_Buh" @ref="catalogGrid">
 	<PropertyColumn Property="item => item.Code" />
@@ -24,6 +36,7 @@
 @code {
 	private QuickGrid<Catalog_Сотрудники_Buh>? catalogGrid;
 	private ApplicationDbContext context = default!;
+	private bool isRefreshing = false;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -32,10 +45,14 @@
 
 	private async Task RefreshCatalog(MouseEventArgs args)
 	{
+		isRefreshing = true;
+
 		await BuhService.RefreshCatalog();
 
 		if (catalogGrid is not null)
 			await catalogGrid.RefreshDataAsync();
+
+		isRefreshing = false;
 	}
 
 
