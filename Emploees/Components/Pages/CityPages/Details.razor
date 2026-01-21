@@ -1,0 +1,47 @@
+﻿@page "/cities/details"
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Детали</PageTitle>
+
+<h1>Детали</h1>
+
+<div>
+    <h2>Город</h2>
+    <hr />
+    @if (city is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Наименование</dt>
+            <dd class="col-sm-10">@city.Name</dd>
+        </dl>
+        <div>
+            <a href="@($"/cities/edit?id={city.Id}")">Изменить</a> |
+            <a href="@($"/cities")">Назад</a>
+        </div>
+    }
+</div>
+
+@code {
+    private City? city;
+
+    [SupplyParameterFromQuery]
+    private string? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        city = await context.Cities.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (city is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+}

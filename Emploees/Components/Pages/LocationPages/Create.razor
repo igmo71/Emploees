@@ -1,0 +1,47 @@
+﻿@page "/locations/create"
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Создать</PageTitle>
+
+<h1>Создать</h1>
+
+<h2>Локацию</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Location" OnValidSubmit="AddEntity" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Наименование:</label>
+                <InputText id="name" @bind-Value="Location.Name" class="form-control" />
+                <ValidationMessage For="() => Location.Name" class="text-danger" />
+            </div>        
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/locations">Назад</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Location Location { get; set; } = default!;
+
+    protected override void OnInitialized() => Location ??= new() { Id = Guid.CreateVersion7().ToString() };
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEntity()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Locations.Add(Location);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/locations");
+    }
+}

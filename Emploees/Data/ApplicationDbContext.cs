@@ -16,6 +16,11 @@ namespace Emploees.Data
 
         public DbSet<AdUser> AdUsers { get; set; }
 
+        public DbSet<CostItem> CostItems { get; set; }
+        public DbSet<JobTitle> JobTitles => Set<JobTitle>();
+        public DbSet<City> Cities => Set<City>();
+        public DbSet<Location> Locations => Set<Location>();
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Catalog_Сотрудники_Zup>().HasKey(e => e.Ref_Key);
@@ -49,6 +54,14 @@ namespace Emploees.Data
                 .HasPrincipalKey<Catalog_СхемаПредприятия>(e => e.Ref_Key);
 
             builder.Entity<AdUser>().HasKey(e => e.Sid);
+
+            builder.Entity<CostItem>().HasKey(e => e.Id);
+
+            builder.Entity<JobTitle>().HasKey(e => e.Id);
+
+            builder.Entity<City>().HasKey(e => e.Id);
+
+            builder.Entity<Location>().HasKey(e => e.Id);
 
             base.OnModelCreating(builder);
         }

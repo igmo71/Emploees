@@ -1,0 +1,56 @@
+﻿@page "/jobtitles/delete"
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@using Emploees.Data
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Удалить</PageTitle>
+
+<h1>Удалить</h1>
+
+<p>Вы действительно хотите удалить?</p>
+<div>
+    <h2>Должность</h2>
+    <hr />
+    @if (jobTitle is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Наименование</dt>
+            <dd class="col-sm-10">@jobTitle?.Name</dd>
+        </dl>
+        <EditForm method="post" Model="jobTitle" OnValidSubmit="DeleteEntity" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(jobTitle is null)">Удалить</button> |
+            <a href="/jobtitles">Назад</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private JobTitle? jobTitle;
+
+    [SupplyParameterFromQuery]
+    private string? Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        jobTitle = await context.JobTitles.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (jobTitle is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    private async Task DeleteEntity()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.JobTitles.Remove(jobTitle!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/jobtitles");
+    }
+}
