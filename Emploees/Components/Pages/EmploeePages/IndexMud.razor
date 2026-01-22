@@ -7,39 +7,113 @@
 
 <PageTitle>Сотрудники</PageTitle>
 
-<h1>Сотрудники (MudBlazor)</h1>
+<h3>пупупу</h3>
 
-<MudDataGrid @ref="_emploeeGrid" T="Emploee" Items="@emploees" Filterable="true" SortMode="SortMode.Multiple">
+<MudDataGrid @ref="_emploeeGrid" T="Emploee" Items="@_emploees" Filterable="true" SortMode="SortMode.Single"
+			 ReadOnly="@(!_isEditGrid)" EditMode="DataGridEditMode.Form"
+			 StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"			 
+			 Bordered="true" Dense="true" EditTrigger="@DataGridEditTrigger.OnRowClick">
+	<ToolBarContent>
+		<MudText Typo="Typo.h6" Class="me-5">Сотрудники</MudText>
+
+		<MudSwitch Class="me-5" @bind-Value="_isEditGrid" Color="Color.Primary">Редактировать</MudSwitch>
+
+
+		<MudFab OnClick="NewItemAsync" Disabled="@(!_isEditGrid)" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Label="Добавить" />
+
+	</ToolBarContent>
 	<Columns>
 		<PropertyColumn Property="x => x.Name" Title="ФИО" />
-		<PropertyColumn Property="x => x.JobTitle == null ? string.Empty : x.JobTitle.Name" Title="Должность" />
+		<PropertyColumn Property="x => x.JobTitle == null ? string.Empty : x.JobTitle.Name" Title="Должность" >
+			<EditTemplate>
+				<MudSelect @bind-Value="context.Item.JobTitleId"
+						   Required="true" RequiredError="Нужно выбрать должность" Margin="@Margin.Dense">
+					@if (_cities is not null)
+					{
+						@foreach (var city in _cities)
+						{
+							<MudSelectItem Value="city.Id">@city.Name</MudSelectItem>
+						}
+					}
+				</MudSelect>
+			</EditTemplate>
+			</PropertyColumn>
 		<PropertyColumn Property="x => x.CostItem == null ? string.Empty : x.CostItem.Name" Title="Статья затрат" />
 		<PropertyColumn Property="x => x.Department == null ? string.Empty : x.Department.Description" Title="Отдел" />
-		<PropertyColumn Property="x => x.City == null ? string.Empty : x.City.Name" Title="Город" />
+		<PropertyColumn Property="x => x.City == null ? string.Empty : x.City.Name" Title="Город">
+			<EditTemplate>
+				<MudSelect @bind-Value="context.Item.CityId"
+						   Required="true" RequiredError="Нужно выбрать город" Margin="@Margin.Dense">
+					@if (_cities is not null)
+					{
+						@foreach (var city in _cities)
+						{
+							<MudSelectItem Value="city.Id">@city.Name</MudSelectItem>
+						}
+					}
+				</MudSelect>
+			</EditTemplate>
+		</PropertyColumn>
 		<PropertyColumn Property="x => x.Location == null ? string.Empty : x.Location.Name" Title="Локация" />
 		<PropertyColumn Property="x => x.UserUt == null ? string.Empty : x.UserUt.Description" Title="Пользователь УТ" />
 		<PropertyColumn Property="x => x.EmploeeBuh == null ? string.Empty : x.EmploeeBuh.Description" Title="Сотрудник БП" />
 		<PropertyColumn Property="x => x.EmploeeZup == null ? string.Empty : x.EmploeeZup.Description" Title="Сотрудник ЗУП" />
 		<PropertyColumn Property="x => x.UserAd == null ? string.Empty : x.UserAd.Name" Title="AD User" />
-		<PropertyColumn Property="x => x.OperationManager == null ? string.Empty : x.OperationManager.Name" Title="Оперативный руководитель" />
-		<PropertyColumn Property="x => x.LocationManager == null ? string.Empty : x.LocationManager.Name" Title="Руководитель Локации" />
+		<PropertyColumn Property="x => x.OperationManager == null ? string.Empty : x.OperationManager.Name" Required="false" Title="Оперативный руководитель" />
+		<PropertyColumn Property="x => x.LocationManager == null ? string.Empty : x.LocationManager.Name" Required="false" Title="Руководитель Локации" />
 	</Columns>
+	
+	@* <ChildRowContent Context="context">
+		@if (_editingItem == context.Item)
+		{
+			<MudPaper Class="pa-4">
+				<MudTextField @bind-Value="context.Item.Name" Label="ФИО" />
+				<MudSelect @bind-Value="context.Item.CityId" Label="Город">
+					@foreach (var c in _cities!)
+					{
+						<MudSelectItem Value="@c.Id">@c.Name</MudSelectItem>
+					}
+				</MudSelect>
+
+				<MudStack Direction="Row" Justify="Justify.SpaceBetween" Class="mt-2">
+					<MudButton Color="Color.Primary" OnClick="@(() => SaveItemAsync(context.Item))">Save</MudButton>
+					<MudButton Color="Color.Error" OnClick="@(() => DeleteItemAsync(context.Item))">Delete</MudButton>
+				</MudStack>
+			</MudPaper>
+		} 
+	</ChildRowContent> *@
+
 	<PagerContent>
 		<MudDataGridPager T="Emploee" />
 	</PagerContent>
+
 </MudDataGrid>
 
-
 @code {
-	private ApplicationDbContext context = default!;
-	private List<Emploee> emploees = []; 
+	private ApplicationDbContext _context = default!;
+
+	private List<Emploee> _emploees = [];
+	private City[]? _cities;
+
+	private Emploee? _editingItem;
+
+
 	private MudDataGrid<Emploee> _emploeeGrid = default!;
 
-	protected override void OnInitialized()
-	{
-		context = DbFactory.CreateDbContext();
+	private List<string> _events = new();
+	private bool _isEditGrid;
 
-		emploees = context.Emploees
+	protected override async Task OnInitializedAsync()
+	{
+		_context = DbFactory.CreateDbContext();
+		await LoadEmploees();
+		await LoadCities();
+
+	}
+
+	private async Task LoadEmploees()
+	{
+		_emploees = await _context.Emploees
 			.Include(e => e.City)
 			.Include(e => e.CostItem)
 			.Include(e => e.Department)
@@ -51,8 +125,78 @@
 			.Include(e => e.OperationManager)
 			.Include(e => e.UserAd)
 			.Include(e => e.UserUt)
-			.ToList();
+			.ToListAsync();
 	}
 
-	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+	private async Task LoadCities()
+	{
+		_cities = await _context.Cities
+			.AsNoTracking().
+			ToArrayAsync();
+	}
+
+	private async Task NewItemAsync()
+	{
+		var emploee = new Emploee(); 
+		
+		_editingItem = emploee;
+
+		await _emploeeGrid.SetEditingItemAsync(emploee);
+	}
+
+	private void DeleteItem(Emploee item)
+	{
+		_emploees.Remove(item);
+	}
+
+
+	// events
+	private void StartedEditingItem(Emploee item)
+	{
+		_events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+	}
+
+	private void CanceledEditingItem(Emploee item)
+	{
+		// update code for backing data here if needed
+		_events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+	}
+
+	private void CommittedItemChanges(Emploee item)
+	{
+		_events.Insert(0, $"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+
+		if (item.Id == Guid.Empty)
+			_context.Emploees.Add(item);
+		else
+			_context.Emploees.Update(item);
+
+		_context.SaveChanges();
+	}
+
+	private async Task SaveItemAsync(Emploee item)
+	{
+		_editingItem = null;
+
+		if (item.Id == Guid.Empty)
+			_context.Emploees.Add(item);
+		else
+			_context.Emploees.Update(item);
+
+		await _context.SaveChangesAsync();
+	}
+
+	private async Task DeleteItemAsync(Emploee item)
+	{
+		_editingItem = null;
+		_emploees.Remove(item);
+
+		if (item.Id != Guid.Empty)
+		{
+			_context.Emploees.Remove(item);
+			await _context.SaveChangesAsync();
+		}
+	}	
+
+	public async ValueTask DisposeAsync() => await _context.DisposeAsync();
 }
