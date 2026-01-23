@@ -79,7 +79,7 @@
 
 			foreach (var item in Items)
 			{
-				if (treeState.ExpandedNodes.Contains(item.Id))
+				if (item.Id is not null && treeState.ExpandedNodes.Contains(item.Id))
 					item.Expanded = true;
 			}
 		}
@@ -101,10 +101,13 @@
 
 		node.Expanded = !node.Expanded;
 
-		if (node.Expanded)
-			treeState.ExpandedNodes.Add(node.Id);
-		else
-			treeState.ExpandedNodes.Remove(node.Id);
+		if (node.Id is not null)
+		{
+			if (node.Expanded)
+				treeState.ExpandedNodes.Add(node.Id);
+			else
+				treeState.ExpandedNodes.Remove(node.Id);
+		}
 
 		expandedAll = Items.All(e => e.Expanded);
 
@@ -123,7 +126,7 @@
 		foreach (var item in Items)
 		{
 			item.Expanded = expandedAll;
-			if (expandedAll)
+			if (expandedAll && item.Id is not null)
 				treeState.ExpandedNodes.Add(item.Id);
 		}
 

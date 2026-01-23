@@ -12,7 +12,7 @@ namespace Emploees.Common
 
             List<TNode> roots = [];
 
-            var lookup = nodes.ToDictionary(e => e.Id);
+            var lookup = nodes.Where(e => e.Id != null).ToDictionary(e => e.Id!);
 
             foreach (var node in nodes)
             {
@@ -58,6 +58,58 @@ namespace Emploees.Common
             }
 
             dfs(node);
+
+            return result;
+        }
+
+        public static List<T> BuildFlattenedTree<T>(List<T> items) where T : ISelfReferencingTree, new()
+        {
+            var result = new List<T>();
+
+            var lookup = items.ToLookup(x => x.ParentId);
+
+            void Build(string? parentKey, int level)
+            {
+                var children = lookup[parentKey].OrderBy(e => e.Name);
+                foreach (var item in children)
+                {
+                    result.Add(new T
+                    {
+                        Id = item.Id,
+                        Name = $"{new string('-', level)} {item.Name ?? string.Empty}"
+                    });
+
+                    Build(item.Id, level + 1);
+                }
+            }
+
+            Build(null, 0);
+
+            return result;
+        }
+
+        public static List<T> BuildFlattenedCatalogTree<T>(List<T> items) where T : ISelfReferencingCatalogTree, new()
+        {
+            var result = new List<T>();
+
+            var lookup = items.ToLookup(x => x.Parent_Key);
+
+            void Build(string? parentKey, int level)
+            {
+                var children = lookup[parentKey].OrderBy(e => e.Description);
+                foreach (var item in children)
+                {
+                    result.Add(new T
+                    {
+                        Ref_Key = item.Ref_Key,
+                        Description = $"{new string('-', level)} {item.Description ?? string.Empty}"
+                    });
+
+                    Build(item.Ref_Key, level + 1);
+                }
+            }
+
+            Build(null, 0);
 
             return result;
         }

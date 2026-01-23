@@ -1,13 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Emploees.Common;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
 
 namespace Emploees.Domain
 {
-    public class CostItem : ITree<CostItem>
+    public class CostItem : ITree<CostItem>, ISelfReferencingTree
     {
         [MaxLength(36)]
-        public required string Id { get; set; }
+        public string? Id { get; set; }
 
         [MaxLength(36)]
         public string? ParentId { get; set; }

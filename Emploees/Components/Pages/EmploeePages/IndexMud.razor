@@ -1,4 +1,5 @@
 ﻿@page "/emploees-mud"
+@using Emploees.Common
 @using Emploees.Data
 @using Emploees.Domain
 @using Microsoft.EntityFrameworkCore
@@ -46,6 +47,8 @@
 						   Label="Статья затрат"
 						   Required="true"
 						   RequiredError="Нужно выбрать статью затрат"
+						   Dense="true"
+						   RelativeWidth="DropdownWidth.Ignore"
 						   Variant="Variant.Text"
 						   Class="mt-2">
 					@if (_costItems is not null)
@@ -58,35 +61,29 @@
 				</MudSelect>
 			</EditTemplate>
 		</PropertyColumn>
+
 		<PropertyColumn Property="x => x.Department == null ? string.Empty : x.Department.Description" Title="Отдел">
 			<EditTemplate>
-				<MudSelect @bind-Value="context.Item.DepartmentId"
-						   Label="Отдел"
-						   Required="false"
-						   Variant="Variant.Text"
-						   Dense="true"
-						   Class="mt-2">
-					@if (_catalogLookupItems is not null)
-					{
-						@foreach (var item in _catalogLookupItems)
-						{
-							<MudSelectItem Value="item.Ref_Key">@item.DisplayName</MudSelectItem>
-						}
-					}
-				</MudSelect>
-			</EditTemplate>
-		</PropertyColumn>
+				@if (_departments != null)
+				{
+					<MudAutocomplete @bind-Value="context.Item.Department"
+									 T="Catalog_СхемаПредприятия"
+									 ToStringFunc="@(e => e?.Description?.TrimStart('-', ' ') ?? string.Empty)"
+									 SearchFunc="SearchDepartment"
+									 Variant="Variant.Text"
+									 Label="Отдел"
+									 Clearable="true"
+									 Margin="Margin.Dense"
+									 Dense="true"
+									 RelativeWidth="DropdownWidth.Ignore">
+						<ItemTemplate Context="item">
+							<MudText Typo="Typo.body2" Style="white-space:nowrap">
+								@item.Description
+							</MudText>
+						</ItemTemplate>
+					</MudAutocomplete>
 
-		<PropertyColumn Property="x => x.Department == null ? string.Empty : x.Department.Description" Title="Отдел">
-			<EditTemplate>			
-
-				<MudAutocomplete @bind-Value="context.Item.DepartmentId"
-								 SearchFunc="SearchDepartment"
-								 Variant="Variant.Text"
-								 Label="Отдел Autocomplete"
-								 Margin="Margin.Dense"
-								 Dense="true"										 
-								  />
+				}
 			</EditTemplate>
 		</PropertyColumn>
 
@@ -133,11 +130,10 @@
 	private ApplicationDbContext _context = default!;
 
 	private List<Emploee> _emploees = [];
-	private JobTitle[]? _jobTitles;
-	private CostItem[]? _costItems;
-	private List<Catalog_СхемаПредприятия>? _departments;
-	private List<CatalogLookupItem>? _catalogLookupItems;
-	private City[]? _cities;
+	private JobTitle[] _jobTitles = [];
+	private City[] _cities = [];
+	private List<CostItem> _costItems = [];
+	private List<Catalog_СхемаПредприятия> _departments = [];
 
 	private MudDataGrid<Emploee> _emploeeGrid = default!;
 
@@ -149,17 +145,21 @@
 	protected override async Task OnInitializedAsync()
 	{
 		_context = DbFactory.CreateDbContext();
-		await LoadEmploees();
-		await LoadJobTitles();
-		await LoadCostItems();
-		await LoadDepartments();
-		await LoadCities();
 
+		_emploees = await LoadEmploees();
+
+		_jobTitles = await LoadJobTitles();
+
+		_cities = await LoadCities();
+
+		_costItems = await LoadCostItems();
+
+		_departments = await LoadDepartments();
 	}
 
-	private async Task LoadEmploees()
+	private Task<List<Emploee>> LoadEmploees()
 	{
-		_emploees = await _context.Emploees
+		return _context.Emploees
 			.AsNoTracking()
 			.Include(e => e.City)
 			.Include(e => e.CostItem)
@@ -175,34 +175,26 @@
 			.ToListAsync();
 	}
 
-	private async Task LoadJobTitles()
+	private Task<JobTitle[]> LoadJobTitles() => _context.JobTitles.AsNoTracking().OrderBy(e => e.Name).ToArrayAsync();
+
+	private Task<City[]> LoadCities() => _context.Cities.AsNoTracking().OrderBy(e => e.Name).ToArrayAsync();
+
+	private async Task<List<CostItem>> LoadCostItems()
 	{
-		_jobTitles = await _context.JobTitles
+		var items = await _context.CostItems
 			.AsNoTracking().
-			ToArrayAsync();
+			ToListAsync();
+
+		return TreeHelper.BuildFlattenedTree(items);
 	}
 
-	private async Task LoadCostItems()
-	{
-		_costItems = await _context.CostItems
-			.AsNoTracking().
-			ToArrayAsync();
-	}
-
-	private async Task LoadDepartments()
+	private async Task<List<Catalog_СхемаПредприятия>> LoadDepartments()
 	{
 		_departments = await _context.Catalog_СхемаПредприятия
 			.AsNoTracking().
 			ToListAsync();
 
-		_catalogLookupItems = GetFlattenedTree(_departments);
-	}
-
-	private async Task LoadCities()
-	{
-		_cities = await _context.Cities
-			.AsNoTracking().
-			ToArrayAsync();
+		return TreeHelper.BuildFlattenedCatalogTree(_departments);
 	}
 
 	private async Task NewItemAsync()
@@ -215,6 +207,25 @@
 	private void DeleteItem(Emploee item)
 	{
 		_emploees.Remove(item);
+	}
+
+	private async Task<IEnumerable<Catalog_СхемаПредприятия>> SearchDepartment(string value, CancellationToken token)
+	{
+		// In real life use an asynchronous function for fetching data from an api.
+		await Task.Delay(5, token);
+
+		if (_departments == null)
+			return Enumerable.Empty<Catalog_СхемаПредприятия>();
+
+		if (string.IsNullOrEmpty(value))
+			return _departments;
+
+		var result = _departments
+			.Where(x => x.Description != null &&
+						x.Description.Contains(value, StringComparison.InvariantCultureIgnoreCase))
+			.ToList();
+
+		return result;
 	}
 
 
@@ -246,6 +257,9 @@
 				return;
 
 			_context.Entry<Emploee>(existing).CurrentValues.SetValues(item);
+
+			if (item.Department is not null)
+				existing.DepartmentId = item.Department.Ref_Key;
 		}
 		await _context.SaveChangesAsync();
 
@@ -256,7 +270,6 @@
 	public async ValueTask DisposeAsync() => await _context.DisposeAsync();
 
 
-
 	private void SelectedItemChanged(Emploee item)
 	{
 		_events.Insert(0, $"Event = SelectedItemChanged, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
@@ -264,64 +277,5 @@
 	private void SelectedItemsChanged(HashSet<Emploee> items)
 	{
 		_events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
-	}
-
-	//////// <summary>
-	/// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/// </summary>
-	public class CatalogLookupItem
-	{
-		public string Ref_Key { get; set; } = string.Empty;
-		public string DisplayName { get; set; } = string.Empty;
-	}
-
-	private async Task<IEnumerable<string>> SearchDepartment(string value, CancellationToken token)
-	{
-		// In real life use an asynchronous function for fetching data from an api.
-		await Task.Delay(5, token);
-
-		// if text is null or empty, show complete list
-		if (string.IsNullOrEmpty(value))
-		{
-			return _departments.Select(e => e.Description) ?? [];
-		}
-
-		//if (_departments is not null)
-			return _departments?.Where(x => 
-				!string.IsNullOrEmpty(x.Description) && x.Description.Contains(value, StringComparison.InvariantCultureIgnoreCase))
-			.Select(e => e.Description) ?? [];
-	}
-
-	public List<CatalogLookupItem> GetFlattenedTree(List<Catalog_СхемаПредприятия> allItems)
-	{
-		var result = new List<CatalogLookupItem>();
-
-		// Группируем для быстрого поиска (O(n))
-		var lookup = allItems.ToLookup(x => x.Parent_Key);
-
-		void Build(string? parentKey, int level)
-		{
-			var children = lookup[parentKey].OrderBy(e => e.Description);
-			foreach (var item in children)
-			{
-				// string indent = new string('\u00A0', level * 4);
-				// string prefix = level > 0 ? "└─ " : "";
-
-				result.Add(new CatalogLookupItem
-				{
-					Ref_Key = item.Ref_Key,
-					//DisplayName = $"{indent}{prefix}{item.Description}"
-					DisplayName = $"{new string('-', level)} {item.Description}"
-				});
-
-				// Рекурсивно заходим вглубь
-				Build(item.Ref_Key, level + 1);
-			}
-		}
-
-		// Запускаем для корня (проверьте, что в БД: null или Empty Guid)
-		Build(null, 0);
-
-		return result;
 	}
 }
