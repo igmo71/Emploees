@@ -8,29 +8,23 @@
 
 <PageTitle>Сотрудники</PageTitle>
 
-<h3>пупупу</h3>
-
-<MudDataGrid @ref="_emploeeGrid" T="Emploee" Items="@_emploees" Filterable="true" SortMode="SortMode.Single"
-			 ReadOnly="@(!_isEditGrid)" EditMode="DataGridEditMode.Form"
+<MudDataGrid @ref="_emploeeGrid" T="Emploee" Items="@_emploees" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" SortMode="SortMode.Single"
+			 ReadOnly="@(!_isEditGrid)" EditMode="DataGridEditMode.Form" Groupable="true" ColumnResizeMode="ResizeMode.Container"
 			 StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
 			 SelectedItemChanged="SelectedItemChanged" SelectedItemsChanged="SelectedItemsChanged"
-			 Bordered="true" EditTrigger="@DataGridEditTrigger.OnRowClick">
+			 Bordered="true" EditTrigger="@DataGridEditTrigger.OnRowClick" Dense="true" 
+			 Can>
 	<ToolBarContent>
-		<MudText Typo="Typo.h6" Class="me-5">Сотрудники</MudText>
+		<MudText Typo="Typo.h4" Class="me-5">Сотрудники</MudText>
 		<MudSwitch Class="me-5" @bind-Value="_isEditGrid" Color="Color.Primary">Редактировать</MudSwitch>
-		<MudFab OnClick="NewItemAsync" Disabled="@(!_isEditGrid)" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Label="Добавить" />
-
+		<MudFab Label="Добавить" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!_isEditGrid)" OnClick="NewItemAsync" />
 	</ToolBarContent>
 	<Columns>
 		<PropertyColumn Property="x => x.Name" Title="ФИО" />
 		<PropertyColumn Property="x => x.JobTitle == null ? string.Empty : x.JobTitle.Name" Title="Должность">
 			<EditTemplate>
-				<MudSelect @bind-Value="context.Item.JobTitleId"
-						   Label="Должность"
-						   Required="true"
-						   RequiredError="Нужно выбрать должность"
-						   Variant="Variant.Text"
-						   Class="mt-2">
+				<MudSelect @bind-Value="context.Item.JobTitleId" Label="Должность" Required="true" RequiredError="Нужно выбрать должность"
+						   Variant="Variant.Outlined">
 					@if (_jobTitles is not null)
 					{
 						@foreach (var item in _jobTitles)
@@ -43,19 +37,22 @@
 		</PropertyColumn>
 		<PropertyColumn Property="x => x.CostItem == null ? string.Empty : x.CostItem.Name" Title="Статья затрат">
 			<EditTemplate>
-				<MudSelect @bind-Value="context.Item.CostItemId"
+				<MudSelect @bind-Value="context.Item.CostItem"
+						   T="CostItem"
+						   ToStringFunc="CleanName"
 						   Label="Статья затрат"
 						   Required="true"
 						   RequiredError="Нужно выбрать статью затрат"
 						   Dense="true"
 						   RelativeWidth="DropdownWidth.Ignore"
-						   Variant="Variant.Text"
-						   Class="mt-2">
+						   Variant="Variant.Outlined">
 					@if (_costItems is not null)
 					{
 						@foreach (var item in _costItems)
 						{
-							<MudSelectItem Value="item.Id">@item.Name</MudSelectItem>
+							<MudSelectItem Value="item">
+								<MudText>@item.Name</MudText>
+							</MudSelectItem>
 						}
 					}
 				</MudSelect>
@@ -68,12 +65,11 @@
 				{
 					<MudAutocomplete @bind-Value="context.Item.Department"
 									 T="Catalog_СхемаПредприятия"
-									 ToStringFunc="@(e => e?.Description?.TrimStart('-', ' ') ?? string.Empty)"
+									 ToStringFunc="CleanDescription"
 									 SearchFunc="SearchDepartment"
-									 Variant="Variant.Text"
+									 Variant="Variant.Outlined"
 									 Label="Отдел"
 									 Clearable="true"
-									 Margin="Margin.Dense"
 									 Dense="true"
 									 RelativeWidth="DropdownWidth.Ignore">
 						<ItemTemplate Context="item">
@@ -82,7 +78,6 @@
 							</MudText>
 						</ItemTemplate>
 					</MudAutocomplete>
-
 				}
 			</EditTemplate>
 		</PropertyColumn>
@@ -91,12 +86,7 @@
 
 		<PropertyColumn Property="x => x.City == null ? string.Empty : x.City.Name" Title="Город">
 			<EditTemplate>
-				<MudSelect @bind-Value="context.Item.CityId"
-						   Label="Город"
-						   Required="true"
-						   RequiredError="Нужно выбрать город"
-						   Variant="Variant.Text"
-						   Class="mt-2">
+				<MudSelect @bind-Value="context.Item.CityId" Label="Город" Required="true" RequiredError="Нужно выбрать город" Variant="Variant.Outlined">
 					@if (_cities is not null)
 					{
 						@foreach (var item in _cities)
@@ -114,16 +104,23 @@
 		<PropertyColumn Property="x => x.UserAd == null ? string.Empty : x.UserAd.Name" Title="AD User" Required="false" />
 		<PropertyColumn Property="x => x.OperationManager == null ? string.Empty : x.OperationManager.Name" Title="Оперативный руководитель" Required="false" />
 		<PropertyColumn Property="x => x.LocationManager == null ? string.Empty : x.LocationManager.Name" Title="Руководитель Локации" Required="false" />
+		<TemplateColumn Hidden="@(!_isEditGrid)">
+			<CellTemplate>
+				<MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" OnClick="@(() => DeleteItem(context.Item))" />
+			</CellTemplate>
+			<EditTemplate>
+				<MudButton Variant="Variant.Outlined" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Delete" Size="Size.Small"
+						   OnClick="@(() => DeleteItem(context.Item))" Class="mt-3">
+					Delete
+				</MudButton>
+			</EditTemplate>
+		</TemplateColumn>
 	</Columns>
 	<PagerContent>
-		<MudDataGridPager T="Emploee" />
+		<MudDataGridPager T="Emploee"  />
 	</PagerContent>
 
 </MudDataGrid>
-<MudStack Class="align-center mud-width-full" Row>
-	<MudSwitch @bind-Value="_fullWidth" Label="Full Width" Color="Color.Primary" />
-	<MudSwitch @bind-Value="_fitContent" Label="Fit Content" Color="Color.Primary" />
-</MudStack>
 
 
 @code {
@@ -145,15 +142,10 @@
 	protected override async Task OnInitializedAsync()
 	{
 		_context = DbFactory.CreateDbContext();
-
 		_emploees = await LoadEmploees();
-
 		_jobTitles = await LoadJobTitles();
-
 		_cities = await LoadCities();
-
 		_costItems = await LoadCostItems();
-
 		_departments = await LoadDepartments();
 	}
 
@@ -181,32 +173,27 @@
 
 	private async Task<List<CostItem>> LoadCostItems()
 	{
-		var items = await _context.CostItems
-			.AsNoTracking().
-			ToListAsync();
+		var items = await _context.CostItems.AsNoTracking().ToListAsync();
 
 		return TreeHelper.BuildFlattenedTree(items);
 	}
 
 	private async Task<List<Catalog_СхемаПредприятия>> LoadDepartments()
 	{
-		_departments = await _context.Catalog_СхемаПредприятия
-			.AsNoTracking().
-			ToListAsync();
+		_departments = await _context.Catalog_СхемаПредприятия.AsNoTracking().ToListAsync();
 
 		return TreeHelper.BuildFlattenedCatalogTree(_departments);
 	}
 
 	private async Task NewItemAsync()
 	{
-		var emploee = new Emploee();
-
-		await _emploeeGrid.SetEditingItemAsync(emploee);
+		await _emploeeGrid.SetEditingItemAsync(new Emploee());
 	}
 
 	private void DeleteItem(Emploee item)
 	{
-		_emploees.Remove(item);
+		_emploees.RemoveAll(e => e.Id == item.Id);
+		_emploeeGrid.CancelEditingItemAsync();
 	}
 
 	private async Task<IEnumerable<Catalog_СхемаПредприятия>> SearchDepartment(string value, CancellationToken token)
@@ -247,7 +234,16 @@
 
 		if (item.Id == Guid.Empty)
 		{
-			await _context.Emploees.AddAsync(item);
+			var existing = new Emploee
+			{
+				Name = item.Name,
+				CityId = item.CityId,
+				CostItemId = item.CostItem?.Id,
+				DepartmentId = item.Department?.Ref_Key,
+				JobTitleId = item.JobTitleId
+
+			};
+			await _context.Emploees.AddAsync(existing);
 		}
 		else
 		{
@@ -258,17 +254,34 @@
 
 			_context.Entry<Emploee>(existing).CurrentValues.SetValues(item);
 
+			if (item.CostItem is not null)
+				existing.CostItemId = item.CostItem.Id;
+
 			if (item.Department is not null)
 				existing.DepartmentId = item.Department.Ref_Key;
 		}
 		await _context.SaveChangesAsync();
 
-		await LoadEmploees();
+		_emploees = await LoadEmploees();
 	}
 
+	private string CleanName<T>(T? item) where T : ISelfReferencingTree
+	{
+		if (item == null || string.IsNullOrEmpty(item.Name))
+			return string.Empty;
+
+		return item.Name.TrimStart('└', '─', '-', ' ', '\u00A0');
+	}
+
+	private string CleanDescription<T>(T? item) where T : ISelfReferencingCatalogTree
+	{
+		if (item == null || string.IsNullOrEmpty(item.Description))
+			return string.Empty;
+
+		return item.Description.TrimStart('└', '─', '-', ' ', '\u00A0');
+	}
 
 	public async ValueTask DisposeAsync() => await _context.DisposeAsync();
-
 
 	private void SelectedItemChanged(Emploee item)
 	{

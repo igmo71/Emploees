@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Emploees.Common
+namespace Emploees.Domain
 {
     public interface ISelfReferencingTree
     {

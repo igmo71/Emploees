@@ -73,10 +73,14 @@ namespace Emploees.Common
                 var children = lookup[parentKey].OrderBy(e => e.Name);
                 foreach (var item in children)
                 {
+                    string indent = new('\u00A0', level * 4);
+                    string prefix = level > 0 ? "└─ " : "";
+
                     result.Add(new T
                     {
                         Id = item.Id,
-                        Name = $"{new string('-', level)} {item.Name ?? string.Empty}"
+                        //Name = $"{new string('-', level)} {item.Name ?? string.Empty}"
+                        Name = $"{indent}{prefix}{item.Name}"
                     });
 
                     Build(item.Id, level + 1);
@@ -99,10 +103,14 @@ namespace Emploees.Common
                 var children = lookup[parentKey].OrderBy(e => e.Description);
                 foreach (var item in children)
                 {
+                    string indent = new('\u00A0', level * 4);
+                    string prefix = level > 0 ? "└─ " : "";
+
                     result.Add(new T
                     {
                         Ref_Key = item.Ref_Key,
-                        Description = $"{new string('-', level)} {item.Description ?? string.Empty}"
+                        //Description = $"{new string('-', level)} {item.Description ?? string.Empty}"
+                        Description = $"{indent}{prefix}{item.Description}"
                     });
 
                     Build(item.Ref_Key, level + 1);
