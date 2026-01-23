@@ -16,6 +16,9 @@ namespace Emploees
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Add MudBlazor services
+            builder.Services.AddMudServices();
+
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
@@ -58,9 +61,6 @@ namespace Emploees
 
             builder.Services.AddAdClient(builder.Configuration);
             builder.Services.AddAdUserService();
-
-            builder.Services.AddMudServices();
-
 
             var app = builder.Build();
 

@@ -1,4 +1,5 @@
-﻿@page "/emploees-mud"
+﻿@page "/"
+@page "/emploees-mud"
 @using Emploees.Common
 @using Emploees.Data
 @using Emploees.Domain
@@ -12,8 +13,7 @@
 			 ReadOnly="@(!_isEditGrid)" EditMode="DataGridEditMode.Form" Groupable="true" ColumnResizeMode="ResizeMode.Container"
 			 StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
 			 SelectedItemChanged="SelectedItemChanged" SelectedItemsChanged="SelectedItemsChanged"
-			 Bordered="true" EditTrigger="@DataGridEditTrigger.OnRowClick" Dense="true" 
-			 Can>
+			 Bordered="true" EditTrigger="@DataGridEditTrigger.OnRowClick" Dense="true">
 	<ToolBarContent>
 		<MudText Typo="Typo.h4" Class="me-5">Сотрудники</MudText>
 		<MudSwitch Class="me-5" @bind-Value="_isEditGrid" Color="Color.Primary">Редактировать</MudSwitch>
@@ -58,7 +58,6 @@
 				</MudSelect>
 			</EditTemplate>
 		</PropertyColumn>
-
 		<PropertyColumn Property="x => x.Department == null ? string.Empty : x.Department.Description" Title="Отдел">
 			<EditTemplate>
 				@if (_departments != null)
@@ -68,7 +67,7 @@
 									 ToStringFunc="CleanDescription"
 									 SearchFunc="SearchDepartment"
 									 Variant="Variant.Outlined"
-									 Label="Отдел"
+									 Label="Отдел (Autocomplete)"
 									 Clearable="true"
 									 Dense="true"
 									 RelativeWidth="DropdownWidth.Ignore">
@@ -81,9 +80,6 @@
 				}
 			</EditTemplate>
 		</PropertyColumn>
-
-
-
 		<PropertyColumn Property="x => x.City == null ? string.Empty : x.City.Name" Title="Город">
 			<EditTemplate>
 				<MudSelect @bind-Value="context.Item.CityId" Label="Город" Required="true" RequiredError="Нужно выбрать город" Variant="Variant.Outlined">
@@ -117,7 +113,7 @@
 		</TemplateColumn>
 	</Columns>
 	<PagerContent>
-		<MudDataGridPager T="Emploee"  />
+		<MudDataGridPager T="Emploee" />
 	</PagerContent>
 
 </MudDataGrid>

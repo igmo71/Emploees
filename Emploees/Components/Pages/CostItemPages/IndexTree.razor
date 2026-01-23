@@ -12,7 +12,7 @@
 
 <div class="row">
 	<div class="col-auto">
-		<TreeView TNode="CostItem" Items="costItems" OmItemCreate="CreateItem" OmItemSelected="ItemSelected" OmItemChanged="ItemChanged">
+		<TreeView TNode="CostItem" Items="costItems" OnItemCreate="CreateItem" OnItemSelected="ItemSelected" OnItemChanged="ItemChanged">
 			<Template Context="item">
 				<div class="btn-group dropend">
 					<div class="btn py-1 text-start">@item.Name</div>
@@ -55,7 +55,7 @@
 
 	private void CreateItem()
 	{
-		NavigationManager.NavigateTo("expenseitems/create");
+		NavigationManager.NavigateTo("cost-item-tree/create");
 	}
 
 	public async ValueTask DisposeAsync() => await context.DisposeAsync();
