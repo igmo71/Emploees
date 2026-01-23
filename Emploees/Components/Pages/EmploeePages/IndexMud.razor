@@ -9,11 +9,21 @@
 
 <PageTitle>Сотрудники</PageTitle>
 
-<MudDataGrid @ref="_emploeeGrid" T="Emploee" Items="@_emploees" Filterable="true" FilterMode="DataGridFilterMode.ColumnFilterMenu" SortMode="SortMode.Single"
-			 ReadOnly="@(!_isEditGrid)" EditMode="DataGridEditMode.Form" Groupable="true" ColumnResizeMode="ResizeMode.Container"
-			 StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
-			 SelectedItemChanged="SelectedItemChanged" SelectedItemsChanged="SelectedItemsChanged"
-			 Bordered="true" EditTrigger="@DataGridEditTrigger.OnRowClick" Dense="true">
+<MudDataGrid @ref="_emploeeGrid" T="Emploee" Items="@_emploees"
+			 Filterable="true" 
+			 FilterMode="DataGridFilterMode.ColumnFilterMenu" 
+			 SortMode="SortMode.Single"
+			 ReadOnly="@(!_isEditGrid)"
+			 Groupable="true" 
+			 ColumnResizeMode="ResizeMode.Container"
+			 StartedEditingItem="@StartedEditingItem" 
+			 CanceledEditingItem="@CanceledEditingItem" 
+			 CommittedItemChanges="@CommittedItemChanges"
+			 SelectedItemChanged="SelectedItemChanged" 
+			 SelectedItemsChanged="SelectedItemsChanged"
+			 Bordered="true" Dense="true" Striped="true" Hover="true"
+			 EditMode="DataGridEditMode.Form"
+			 EditTrigger="@DataGridEditTrigger.OnRowClick">
 	<ToolBarContent>
 		<MudText Typo="Typo.h4" Class="me-5">Сотрудники</MudText>
 		<MudSwitch Class="me-5" @bind-Value="_isEditGrid" Color="Color.Primary">Редактировать</MudSwitch>

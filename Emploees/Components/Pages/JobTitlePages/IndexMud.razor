@@ -1,0 +1,78 @@
+﻿@page "/jobtitles-mud"
+@using Emploees.Data
+@using Emploees.Domain
+@using Microsoft.EntityFrameworkCore
+@implements IAsyncDisposable
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Должности</PageTitle>
+
+<MudGrid xs="12" sm="6" md="4" Class="ms-1 mt-2">
+	<MudDataGrid @ref="_elementGrid" T="JobTitle" Items="@_elements"
+				 ReadOnly="false"
+				 Filterable="true"
+				 CommittedItemChanges="@CommittedItemChanges"
+				 Bordered="true" Dense="true" 
+				 Striped="true" Hover="true"
+				 EditMode="DataGridEditMode.Form"
+				 EditTrigger="DataGridEditTrigger.Manual">
+		<ToolBarContent>
+			<MudText Typo="Typo.h4">Должности</MudText>
+			<MudSpacer />
+			<MudButtonGroup Class="ma-0 pa-0" Color="Color.Success" Variant="Variant.Filled">
+				<MudButton OnClick="NewItemAsync" StartIcon="@Icons.Material.Filled.Add">
+					Добавить
+				</MudButton>
+			</MudButtonGroup>
+		</ToolBarContent>
+		<Columns>
+			<MudBlazor.PropertyColumn Property="x => x.Name" Title="Наименование" />
+
+			<TemplateColumn CellClass="d-flex justify-between">
+				<CellTemplate>
+					<MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+					<MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => DeleteItem(context.Item))" />
+				</CellTemplate>
+			</TemplateColumn>
+		</Columns>
+		<PagerContent>
+			<MudDataGridPager T="JobTitle" />
+		</PagerContent>
+	</MudDataGrid>
+</MudGrid>
+@code {
+	private ApplicationDbContext context = default!;
+	private List<JobTitle> _elements = [];
+	private MudDataGrid<JobTitle> _elementGrid = default!;
+	private bool _isEditGrid;
+
+	protected override void OnInitialized()
+	{
+		context = DbFactory.CreateDbContext();
+
+		_elements = context.JobTitles.ToList();
+	}
+
+	private async Task NewItemAsync()
+	{
+		var elem = new JobTitle();
+
+		await _elementGrid.SetEditingItemAsync(elem);
+	}
+
+	private void DeleteItem(JobTitle item)
+	{
+		_elements.Remove(item);
+	}
+
+	private void CommittedItemChanges(JobTitle item)
+	{
+		if (string.IsNullOrEmpty(item.Id)) // new item
+		{
+			item.Id = Guid.CreateVersion7().ToString();
+			_elements.Add(item);
+		}
+	}
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
