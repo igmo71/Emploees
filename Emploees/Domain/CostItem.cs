@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Emploees.Abstractions;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Emploees.Domain
 {
-    public class CostItem : ITree<CostItem>, ISelfReferencingTree
+    public class CostItem : ITree<CostItem>, IHasId, IHasParentId, IHasName
     {
         [MaxLength(36)]
         public string? Id { get; set; }

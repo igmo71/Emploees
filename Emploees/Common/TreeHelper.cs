@@ -1,4 +1,4 @@
-﻿using Emploees.Domain;
+﻿using Emploees.Abstractions;
 
 namespace Emploees.Common
 {
@@ -62,7 +62,7 @@ namespace Emploees.Common
             return result;
         }
 
-        public static List<T> BuildFlattenedTree<T>(List<T> items) where T : ISelfReferencingTree, new()
+        public static List<T> BuildFlattenedTree<T>(List<T> items) where T : IHasId, IHasParentId, IHasName, new()
         {
             var result = new List<T>();
 
@@ -92,7 +92,7 @@ namespace Emploees.Common
             return result;
         }
 
-        public static List<T> BuildFlattenedCatalogTree<T>(List<T> items) where T : ISelfReferencingCatalogTree, new()
+        public static List<T> BuildFlattenedCatalogTree<T>(List<T> items) where T : IHasRefKey, IHasParentKey, IHasDescription, new()
         {
             var result = new List<T>();
 

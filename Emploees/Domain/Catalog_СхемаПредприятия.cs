@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Emploees.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace Emploees.Domain
 {
-    public class Catalog_СхемаПредприятия : ISelfReferencingCatalogTree
+    public class Catalog_СхемаПредприятия : IHasRefKey, IHasParentKey, IHasDescription
     {
         [MaxLength(AppSettings.GUID)] public string? Ref_Key { get; set; }
         [MaxLength(AppSettings.GUID)] public string? Parent_Key { get; set; }

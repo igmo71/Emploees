@@ -1,4 +1,4 @@
-﻿namespace Emploees.Domain
+﻿namespace Emploees.Abstractions
 {
     public interface ITree<TNode>
     {

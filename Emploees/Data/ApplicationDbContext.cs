@@ -10,7 +10,7 @@ namespace Emploees.Data
 
         public DbSet<Catalog_Сотрудники_Buh> Catalog_Сотрудники_Buh { get; set; }
 
-        public DbSet<Catalog_Пользователи> Catalog_Пользователиs { get; set; }
+        public DbSet<Catalog_Пользователи> Catalog_Пользователи { get; set; }
         public DbSet<Catalog_СхемаПредприятия> Catalog_СхемаПредприятия { get; set; } = default!;
         public DbSet<Пользователь_СхемаПредприятия> Пользователь_СхемаПредприятия { get; set; }
 
