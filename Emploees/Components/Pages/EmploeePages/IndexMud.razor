@@ -30,7 +30,7 @@
 		<MudFab Class="ms-5" Label="Добавить" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!_isEditGrid)" OnClick="NewItemAsync" />
 		<MudSpacer />
 		<MudTextField @bind-Value="_searchString" Placeholder="Поиск по ФИО, Должности или Статье затрат" Adornment="Adornment.Start" Immediate="true"
-					  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"></MudTextField>
+					  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Clearable="true"></MudTextField>
 		<MudSpacer />
 	</ToolBarContent>
 	<Columns>
@@ -54,6 +54,7 @@
 						   Label="Выбор Должности"
 						   Required="true"
 						   RequiredError="Нужно выбрать должность"
+						   RelativeWidth="DropdownWidth.Ignore"
 						   Variant="Variant.Outlined"
 						   Clearable="true"
 						   Dense="true">
@@ -263,10 +264,14 @@
 @code {
 	private ApplicationDbContext _context = default!;
 
-	[PersistentState] public List<Emploee>? Emploees { get; set; }
-	[PersistentState] public JobTitle[]? JobTitles { get; set; }
-	[PersistentState] public City[]? Cities { get; set; }
-	[PersistentState] public Location[]? Locations { get; set; }
+	//[PersistentState]
+	public List<Emploee>? Emploees { get; set; }
+	[PersistentState] 
+	public JobTitle[]? JobTitles { get; set; }
+	[PersistentState]
+	public City[]? Cities { get; set; }
+	[PersistentState]
+	public Location[]? Locations { get; set; }
 
 	//[PersistentState]
 	public List<CostItem>? CostItems { get; set; }
@@ -473,40 +478,41 @@
 	{
 		//_events.Insert(0, $"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
 
+		Emploee? existing;
+
 		if (item.Id == Guid.Empty)
 		{
-			var existing = new Emploee
-			{
-				Name = item.Name,
-				CityId = item.CityId,
-				CostItemId = item.CostItem?.Id,
-				DepartmentId = item.Department?.Ref_Key,
-				JobTitleId = item.JobTitleId
+			existing = new();
 
-			};
 			await _context.Emploees.AddAsync(existing);
 		}
 		else
 		{
-			var existing = _context.Emploees.FirstOrDefault(e => e.Id == item.Id);
+			existing = _context.Emploees.FirstOrDefault(e => e.Id == item.Id);
 
 			if (existing is null)
 				return;
-
-			_context.Entry<Emploee>(existing).CurrentValues.SetValues(item);
-
-			existing.CostItemId = item.CostItem is null ? null : item.CostItem.Id;
-
-			existing.DepartmentId = item.Department is null ? null : item.Department?.Ref_Key;
-
-			existing.UserUtId = item.UserUt is null ? null : item.UserUt.Ref_Key;
-
-			existing.EmploeeBuhId = item.EmploeeBuh is null ? null : item.EmploeeBuh.Ref_Key;
-
-			existing.EmploeeZupId = item.EmploeeZup is null ? null : item.EmploeeZup.Ref_Key;
-
-			existing.UserAdId = item.UserAd is null ? null : item.UserAd.Sid;
 		}
+		existing.Name = item.Name;
+
+		existing.JobTitleId = item.JobTitleId;
+
+		existing.CostItemId = item.CostItem?.Id;
+
+		existing.DepartmentId = item.Department?.Ref_Key;
+
+		existing.CityId = item.CityId;
+
+		existing.LocationId = item.LocationId;
+
+		existing.UserUtId = item.UserUt?.Ref_Key;
+
+		existing.EmploeeBuhId = item.EmploeeBuh?.Ref_Key;
+
+		existing.EmploeeZupId = item.EmploeeZup?.Ref_Key;
+
+		existing.UserAdId = item.UserAd?.Sid;
+
 		await _context.SaveChangesAsync();
 
 		Emploees = await LoadEmploees();
