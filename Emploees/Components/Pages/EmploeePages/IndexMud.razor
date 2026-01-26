@@ -21,11 +21,17 @@
 			 ColumnResizeMode="ResizeMode.Container"
 			 EditMode="DataGridEditMode.Form"
 			 EditTrigger="@DataGridEditTrigger.OnRowClick"
-			 CommittedItemChanges="@CommittedItemChanges">
+			 CommittedItemChanges="@CommittedItemChanges"
+			 QuickFilter="QuickFilter">
 	<ToolBarContent>
-		<MudText Typo="Typo.h4" Class="me-5">Сотрудники</MudText>
-		<MudSwitch Class="me-5" T="bool" ValueChanged="ToggleEditingGrid" Color="Color.Primary">Редактировать</MudSwitch>
-		<MudFab Label="Добавить" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!_isEditGrid)" OnClick="NewItemAsync" />
+		<MudText Typo="Typo.h4">Сотрудники</MudText>
+		<MudSpacer />
+		<MudSwitch T="bool" ValueChanged="ToggleEditingGrid" Color="Color.Primary">Редактировать</MudSwitch>
+		<MudFab Class="ms-5" Label="Добавить" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!_isEditGrid)" OnClick="NewItemAsync" />
+		<MudSpacer />
+		<MudTextField @bind-Value="_searchString" Placeholder="Поиск по ФИО, Должности или Статье затрат" Adornment="Adornment.Start" Immediate="true"
+					  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium"></MudTextField>
+		<MudSpacer />
 	</ToolBarContent>
 	<Columns>
 		<PropertyColumn Property="x => x.Name" Title="ФИО">
@@ -273,6 +279,7 @@
 	private MudDataGrid<Emploee> _emploeeGrid = default!;
 
 	private List<string> _events = new();
+	private string? _searchString;
 	private bool _isEditGrid;
 
 	protected override async Task OnInitializedAsync()
@@ -439,6 +446,24 @@
 	{
 		_isEditGrid = args;
 	}
+
+
+	private Func<Emploee, bool> QuickFilter => e =>
+	{
+		if (string.IsNullOrEmpty(_searchString))
+			return true;
+
+		if (!string.IsNullOrEmpty(e.Name) && e.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+			return true;
+
+		if (!string.IsNullOrEmpty(e.JobTitle?.Name) && e.JobTitle.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+			return true;
+
+		if (!string.IsNullOrEmpty(e.CostItem?.Name) && e.CostItem.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+			return true;
+
+		return false;
+	};
 
 	public async ValueTask DisposeAsync() => await _context.DisposeAsync();
 
