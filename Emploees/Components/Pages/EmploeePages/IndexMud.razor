@@ -20,12 +20,8 @@
 			 Groupable="true"
 			 ColumnResizeMode="ResizeMode.Container"
 			 EditMode="DataGridEditMode.Form"
-			 EditTrigger="@DataGridEditTrigger.OnRowClick"
-			 StartedEditingItem="@StartedEditingItem"
-			 CanceledEditingItem="@CanceledEditingItem"
-			 CommittedItemChanges="@CommittedItemChanges"
-			 SelectedItemChanged="SelectedItemChanged"
-			 SelectedItemsChanged="SelectedItemsChanged">
+			 EditTrigger="@DataGridEditTrigger.OnRowClick"			 
+			 CommittedItemChanges="@CommittedItemChanges">
 	<ToolBarContent>
 		<MudText Typo="Typo.h4" Class="me-5">Сотрудники</MudText>
 		<MudSwitch Class="me-5" T="bool" ValueChanged="ToggleEditingGrid" Color="Color.Primary">Редактировать</MudSwitch>
@@ -219,7 +215,9 @@
 				</MudAutocomplete>
 			</EditTemplate>
 		</PropertyColumn>
-		<PropertyColumn Property="x => x.OperationManager == null ? string.Empty : x.OperationManager.Name" Title="Оперативный руководитель" Required="false" />
+		<PropertyColumn Property="x => x.OperationManager == null ? string.Empty : x.OperationManager.Name" Title="Оперативный руководитель" Required="false">
+
+		</PropertyColumn>
 		<PropertyColumn Property="x => x.LocationManager == null ? string.Empty : x.LocationManager.Name" Title="Руководитель Локации" Required="false" />
 		<TemplateColumn Hidden="@(!_isEditGrid)">
 			<CellTemplate>
@@ -338,6 +336,8 @@
 
 	private async Task<IEnumerable<Catalog_СхемаПредприятия>> SearchDepartment(string value, CancellationToken token)
 	{
+		await Task.Delay(5, token);
+
 		if (Departments is null)
 			return [];
 
@@ -353,6 +353,8 @@
 
 	private async Task<IEnumerable<Catalog_Пользователи>> SearchUserUt(string value, CancellationToken token)
 	{
+		await Task.Delay(5, token);
+
 		if (UsersUt is null)
 			return [];
 
@@ -368,6 +370,8 @@
 
 	private async Task<IEnumerable<Catalog_Сотрудники_Buh>> SearchEmployeeBuh(string value, CancellationToken token)
 	{
+		await Task.Delay(5, token);
+
 		if (EmploeesBuh is null)
 			return [];
 
@@ -383,6 +387,8 @@
 
 	private async Task<IEnumerable<Catalog_Сотрудники_Zup>> SearchEmployeeZup(string value, CancellationToken token)
 	{
+		await Task.Delay(5, token);
+
 		if (EmploeesZup is null)
 			return [];
 
@@ -400,6 +406,8 @@
 
 	private async Task<IEnumerable<AdUser>> SearchUserAd(string value, CancellationToken token)
 	{
+		await Task.Delay(5, token);
+
 		if (UsersAd is null)
 			return [];
 
@@ -431,7 +439,7 @@
 
 	private void ToggleEditingGrid(bool args)
 	{
-		_isEditGrid = !_isEditGrid;
+		_isEditGrid = args;
 	}
 
 	public async ValueTask DisposeAsync() => await _context.DisposeAsync();
@@ -467,8 +475,8 @@
 			if (item.CostItem is not null)
 				existing.CostItemId = item.CostItem.Id;
 
-			if (item.Department is not null)
-				existing.DepartmentId = item.Department.Ref_Key;
+			//if (item.Department is not null)
+				existing.DepartmentId = item.Department?.Ref_Key;
 
 			if (item.UserUt is not null)
 				existing.UserUtId = item.UserUt.Ref_Key;
@@ -478,30 +486,32 @@
 
 			if (item.EmploeeZup is not null)
 				existing.EmploeeZupId = item.EmploeeZup.Ref_Key;
+
+			if (item.UserAd is not null)
+				existing.UserAdId = item.UserAd.Sid;
 		}
 		await _context.SaveChangesAsync();
 
 		Emploees = await LoadEmploees();
 	}
 
-	private void StartedEditingItem(Emploee item)
-	{
-		_events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
-	}
+	// private void StartedEditingItem(Emploee item)
+	// {
+	// 	_events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+	// }
 
-	private void CanceledEditingItem(Emploee item)
-	{
-		// update code for backing data here if needed
-		_events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
-	}
+	// private void CanceledEditingItem(Emploee item)
+	// {
+	// 	_events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+	// }
 
-	private void SelectedItemChanged(Emploee item)
-	{
-		_events.Insert(0, $"Event = SelectedItemChanged, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
-	}
+	// private void SelectedItemChanged(Emploee item)
+	// {
+	// 	_events.Insert(0, $"Event = SelectedItemChanged, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+	// }
 
-	private void SelectedItemsChanged(HashSet<Emploee> items)
-	{
-		_events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
-	}
+	// private void SelectedItemsChanged(HashSet<Emploee> items)
+	// {
+	// 	_events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
+	// }
 }
