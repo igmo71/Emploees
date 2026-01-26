@@ -20,7 +20,7 @@
 			 Groupable="true"
 			 ColumnResizeMode="ResizeMode.Container"
 			 EditMode="DataGridEditMode.Form"
-			 EditTrigger="@DataGridEditTrigger.OnRowClick"			 
+			 EditTrigger="@DataGridEditTrigger.OnRowClick"
 			 CommittedItemChanges="@CommittedItemChanges">
 	<ToolBarContent>
 		<MudText Typo="Typo.h4" Class="me-5">Сотрудники</MudText>
@@ -32,15 +32,25 @@
 			<EditTemplate>
 				<MudGrid style="min-width: 500px">
 					<MudItem xs="12">
-						<MudTextField @bind-Value="context.Item.Name" Label="ФИО" Variant="Variant.Outlined" />
+						<MudTextField @bind-Value="context.Item.Name"
+									  Label="Ввод ФИО"
+									  Variant="Variant.Outlined"
+									  Required="true"
+									  RequiredError="Нужно ввести ФИО"
+									  Clearable="true" />
 					</MudItem>
 				</MudGrid>
 			</EditTemplate>
 		</PropertyColumn>
 		<PropertyColumn Property="x => x.JobTitle == null ? string.Empty : x.JobTitle.Name" Title="Должность">
 			<EditTemplate>
-				<MudSelect @bind-Value="context.Item.JobTitleId" Label="Должность" Required="true" RequiredError="Нужно выбрать должность"
-						   Variant="Variant.Outlined">
+				<MudSelect @bind-Value="context.Item.JobTitleId"
+						   Label="Выбор Должности"
+						   Required="true"
+						   RequiredError="Нужно выбрать должность"
+						   Variant="Variant.Outlined"
+						   Clearable="true"
+						   Dense="true">
 					@if (JobTitles is not null)
 					{
 						foreach (var item in JobTitles)
@@ -56,12 +66,13 @@
 				<MudSelect @bind-Value="context.Item.CostItem"
 						   T="CostItem"
 						   ToStringFunc="CleanName"
-						   Label="Статья затрат"
+						   Label="Выбор Статьи затрат"
 						   Required="true"
 						   RequiredError="Нужно выбрать статью затрат"
-						   Dense="true"
 						   RelativeWidth="DropdownWidth.Ignore"
-						   Variant="Variant.Outlined">
+						   Variant="Variant.Outlined"
+						   Clearable="true"
+						   Dense="true">
 
 					@if (CostItems is not null)
 					{
@@ -82,7 +93,7 @@
 								 ToStringFunc="CleanDescription"
 								 SearchFunc="SearchDepartment"
 								 Variant="Variant.Outlined"
-								 Label="Отдел"
+								 Label="Поиск Отдела (в Схеме предприятия)"
 								 Required="true"
 								 RequiredError="Нужно выбрать отдел"
 								 Clearable="true"
@@ -98,7 +109,13 @@
 		</PropertyColumn>
 		<PropertyColumn Property="x => x.City == null ? string.Empty : x.City.Name" Title="Город">
 			<EditTemplate>
-				<MudSelect @bind-Value="context.Item.CityId" Label="Город" Required="true" RequiredError="Нужно выбрать город" Variant="Variant.Outlined">
+				<MudSelect @bind-Value="context.Item.CityId"
+						   Label="Выберите Город"
+						   Required="true"
+						   RequiredError="Нужно выбрать город"
+						   Variant="Variant.Outlined"
+						   Clearable="true"
+						   Dense="true">
 					@if (Cities is not null)
 					{
 						foreach (var item in Cities)
@@ -111,7 +128,13 @@
 		</PropertyColumn>
 		<PropertyColumn Property="x => x.Location == null ? string.Empty : x.Location.Name" Title="Локация" Required="false">
 			<EditTemplate>
-				<MudSelect @bind-Value="context.Item.LocationId" Label="Локация" Required="true" RequiredError="Нужно выбрать локацию" Variant="Variant.Outlined">
+				<MudSelect @bind-Value="context.Item.LocationId"
+						   Label="Выбор Локации"
+						   Required="true"
+						   RequiredError="Нужно выбрать локацию"
+						   Variant="Variant.Outlined"
+						   Clearable="true"
+						   Dense="true">
 					@if (Locations is not null)
 					{
 						foreach (var item in Locations)
@@ -129,7 +152,7 @@
 								 ToStringFunc="@(e => e == null ? string.Empty : $"{e.Description}" )"
 								 SearchFunc="SearchUserUt"
 								 Variant="Variant.Outlined"
-								 Label="Пользователь УТ"
+								 Label="Поиск Пользователя УТ"
 								 Clearable="true"
 								 Dense="true"
 								 RelativeWidth="DropdownWidth.Ignore">
@@ -143,7 +166,8 @@
 		</PropertyColumn>
 		<PropertyColumn Property="x => x.EmploeeBuh == null ? string.Empty : x.EmploeeBuh.Description" Title="Сотрудник БП" Required="false">
 			<CellTemplate>
-				@context.Item.EmploeeBuh?.Description (@context.Item.EmploeeBuh?.Code)
+				@context.Item.EmploeeBuh?.Description
+				@(string.IsNullOrEmpty(context.Item.EmploeeBuh?.Code) ? string.Empty : $"({context.Item.EmploeeBuh?.Code})")
 			</CellTemplate>
 			<EditTemplate>
 				<MudAutocomplete @bind-Value="context.Item.EmploeeBuh"
@@ -151,7 +175,7 @@
 								 ToStringFunc="@(e => e == null ? string.Empty : $"{e.Description} ({e.Code})" )"
 								 SearchFunc="SearchEmployeeBuh"
 								 Variant="Variant.Outlined"
-								 Label="Сотрудник БП"
+								 Label="Поиск Сотрудника БП"
 								 Clearable="true"
 								 Dense="true"
 								 RelativeWidth="DropdownWidth.Ignore">
@@ -166,14 +190,7 @@
 		<PropertyColumn Property="x => x.EmploeeZup == null ? string.Empty : x.EmploeeZup.Description" Title="Сотрудник ЗУП" Required="false">
 			<CellTemplate>
 				@context.Item.EmploeeZup?.Description
-				@if (string.IsNullOrEmpty(context.Item.EmploeeZup?.Code))
-				{
-					@string.Empty
-				}
-				else
-				{
-					@($"({context.Item.EmploeeZup?.Code})")
-				}
+				@(string.IsNullOrEmpty(context.Item.EmploeeZup?.Code) ? string.Empty : $"({context.Item.EmploeeZup?.Code})")
 			</CellTemplate>
 			<EditTemplate>
 				<MudAutocomplete @bind-Value="context.Item.EmploeeZup" FullWidth="true"
@@ -181,7 +198,7 @@
 								 ToStringFunc="@(e => e == null ? string.Empty : $"{e.Description} ({e.Code})" )"
 								 SearchFunc="SearchEmployeeZup"
 								 Variant="Variant.Outlined"
-								 Label="Сотрудник ЗУП"
+								 Label="Поиск Сотрудника ЗУП"
 								 Clearable="true"
 								 Dense="true"
 								 RelativeWidth="DropdownWidth.Ignore">
@@ -203,7 +220,7 @@
 								 ToStringFunc="@(e => e == null ? string.Empty :e.Name)"
 								 SearchFunc="SearchUserAd"
 								 Variant="Variant.Outlined"
-								 Label="User AD"
+								 Label="Поиск пользователя AD"
 								 Clearable="true"
 								 Dense="true"
 								 RelativeWidth="DropdownWidth.Ignore">
@@ -242,15 +259,16 @@
 
 	[PersistentState] public List<Emploee>? Emploees { get; set; }
 	[PersistentState] public JobTitle[]? JobTitles { get; set; }
-	[PersistentState] public List<CostItem>? CostItems { get; set; }
-	[PersistentState] public List<Catalog_СхемаПредприятия>? Departments { get; set; }
 	[PersistentState] public City[]? Cities { get; set; }
 	[PersistentState] public Location[]? Locations { get; set; }
-	[PersistentState] public Catalog_Пользователи[]? UsersUt { get; set; }
-	[PersistentState] public Catalog_Сотрудники_Buh[]? EmploeesBuh { get; set; }
-	[PersistentState] public Catalog_Сотрудники_Zup[]? EmploeesZup { get; set; }
-	[PersistentState] public AdUser[]? UsersAd { get; set; }
 
+	//[PersistentState]
+	public List<CostItem>? CostItems { get; set; }
+	public List<Catalog_СхемаПредприятия>? Departments { get; set; }
+	public Catalog_Пользователи[]? UsersUt { get; set; }
+	public Catalog_Сотрудники_Buh[]? EmploeesBuh { get; set; }
+	public Catalog_Сотрудники_Zup[]? EmploeesZup { get; set; }
+	public AdUser[]? UsersAd { get; set; }
 
 	private MudDataGrid<Emploee> _emploeeGrid = default!;
 
@@ -331,94 +349,74 @@
 
 		await _context.Emploees.Where(e => e.Id == item.Id).ExecuteDeleteAsync();
 
+		Emploees = await LoadEmploees();
+
 		await _emploeeGrid.CancelEditingItemAsync();
 	}
 
-	private async Task<IEnumerable<Catalog_СхемаПредприятия>> SearchDepartment(string value, CancellationToken token)
+	private Task<IEnumerable<Catalog_СхемаПредприятия>> SearchDepartment(string value, CancellationToken token)
 	{
-		await Task.Delay(5, token);
-
 		if (Departments is null)
-			return [];
+			return Task.FromResult(Enumerable.Empty<Catalog_СхемаПредприятия>());
 
 		if (string.IsNullOrEmpty(value))
-			return Departments;
+			return Task.FromResult(Departments.AsEnumerable());
 
-		var result = Departments
+		return Task.FromResult(Departments
 			.Where(x => x.Description != null && x.Description.Contains(value, StringComparison.InvariantCultureIgnoreCase))
-			.ToList();
-
-		return result;
+			.ToList().AsEnumerable());
 	}
 
-	private async Task<IEnumerable<Catalog_Пользователи>> SearchUserUt(string value, CancellationToken token)
+	private Task<IEnumerable<Catalog_Пользователи>> SearchUserUt(string value, CancellationToken token)
 	{
-		await Task.Delay(5, token);
-
 		if (UsersUt is null)
-			return [];
+			return Task.FromResult(Enumerable.Empty<Catalog_Пользователи>());
 
 		if (string.IsNullOrEmpty(value))
-			return UsersUt;
+			return Task.FromResult(UsersUt.AsEnumerable());
 
-		var result = UsersUt
+		return Task.FromResult(UsersUt
 			.Where(x => x.Description != null && x.Description.Contains(value, StringComparison.InvariantCultureIgnoreCase))
-			.ToList();
-
-		return result;
+			.ToList().AsEnumerable());
 	}
 
-	private async Task<IEnumerable<Catalog_Сотрудники_Buh>> SearchEmployeeBuh(string value, CancellationToken token)
+	private Task<IEnumerable<Catalog_Сотрудники_Buh>> SearchEmployeeBuh(string value, CancellationToken token)
 	{
-		await Task.Delay(5, token);
-
 		if (EmploeesBuh is null)
-			return [];
+			return Task.FromResult(Enumerable.Empty<Catalog_Сотрудники_Buh>());
 
 		if (string.IsNullOrEmpty(value))
-			return EmploeesBuh;
+			return Task.FromResult(EmploeesBuh.AsEnumerable());
 
-		var result = EmploeesBuh
+		return Task.FromResult(EmploeesBuh
 			.Where(x => x.Description != null && x.Description.Contains(value, StringComparison.InvariantCultureIgnoreCase))
-			.ToList();
-
-		return result;
+			.ToList().AsEnumerable());
 	}
 
-	private async Task<IEnumerable<Catalog_Сотрудники_Zup>> SearchEmployeeZup(string value, CancellationToken token)
+	private Task<IEnumerable<Catalog_Сотрудники_Zup>> SearchEmployeeZup(string value, CancellationToken token)
 	{
-		await Task.Delay(5, token);
-
 		if (EmploeesZup is null)
-			return [];
+			return Task.FromResult(Enumerable.Empty<Catalog_Сотрудники_Zup>());
 
 		if (string.IsNullOrEmpty(value))
-			return EmploeesZup;
+			return Task.FromResult(EmploeesZup.AsEnumerable());
 
-		var result = EmploeesZup
+		return Task.FromResult(EmploeesZup
 			.Where(x => x.Description != null && x.Description.Contains(value, StringComparison.InvariantCultureIgnoreCase))
-			.ToList();
-
-		return result;
+			.ToList().AsEnumerable());
 	}
 
-
-
-	private async Task<IEnumerable<AdUser>> SearchUserAd(string value, CancellationToken token)
+	private Task<IEnumerable<AdUser>> SearchUserAd(string value, CancellationToken token)
 	{
-		await Task.Delay(5, token);
-
 		if (UsersAd is null)
-			return [];
+			return Task.FromResult(Enumerable.Empty<AdUser>());
 
 		if (string.IsNullOrEmpty(value))
-			return UsersAd;
+			return Task.FromResult(UsersAd.AsEnumerable());
 
-		var result = UsersAd
+		return Task.FromResult(UsersAd
 			.Where(x => x.Name != null && x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase))
-			.ToList();
-
-		return result;
+			.ToList().AsEnumerable());
 	}
 
 	private string CleanName<T>(T? item) where T : IHasName
@@ -448,7 +446,7 @@
 
 	private async Task CommittedItemChanges(Emploee item)
 	{
-		_events.Insert(0, $"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
+		//_events.Insert(0, $"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
 
 		if (item.Id == Guid.Empty)
 		{
@@ -472,23 +470,17 @@
 
 			_context.Entry<Emploee>(existing).CurrentValues.SetValues(item);
 
-			if (item.CostItem is not null)
-				existing.CostItemId = item.CostItem.Id;
+			existing.CostItemId = item.CostItem is null ? null : item.CostItem.Id;
 
-			//if (item.Department is not null)
-				existing.DepartmentId = item.Department?.Ref_Key;
+			existing.DepartmentId = item.Department is null ? null : item.Department?.Ref_Key;
 
-			if (item.UserUt is not null)
-				existing.UserUtId = item.UserUt.Ref_Key;
+			existing.UserUtId = item.UserUt is null ? null : item.UserUt.Ref_Key;
 
-			if (item.EmploeeBuh is not null)
-				existing.EmploeeBuhId = item.EmploeeBuh.Ref_Key;
+			existing.EmploeeBuhId = item.EmploeeBuh is null ? null : item.EmploeeBuh.Ref_Key;
 
-			if (item.EmploeeZup is not null)
-				existing.EmploeeZupId = item.EmploeeZup.Ref_Key;
+			existing.EmploeeZupId = item.EmploeeZup is null ? null : item.EmploeeZup.Ref_Key;
 
-			if (item.UserAd is not null)
-				existing.UserAdId = item.UserAd.Sid;
+			existing.UserAdId = item.UserAd is null ? null : item.UserAd.Sid;
 		}
 		await _context.SaveChangesAsync();
 
