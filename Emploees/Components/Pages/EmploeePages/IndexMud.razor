@@ -22,19 +22,22 @@
 			 EditMode="DataGridEditMode.Form"
 			 EditTrigger="@DataGridEditTrigger.OnRowClick"
 			 CommittedItemChanges="@CommittedItemChanges"
-			 QuickFilter="QuickFilter">
+			 QuickFilter="QuickFilter"
+			 DragDropColumnReordering="true" 
+			 ApplyDropClassesOnDragStarted="true" 
+			 DragIndicatorIcon="@Icons.Material.Filled.DragIndicator">
 	<ToolBarContent>
 		<MudText Typo="Typo.h4">Сотрудники</MudText>
 		<MudSpacer />
 		<MudSwitch T="bool" ValueChanged="ToggleEditingGrid" Color="Color.Primary">Редактировать</MudSwitch>
 		<MudFab Class="ms-5" Label="Добавить" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" Disabled="@(!_isEditGrid)" OnClick="NewItemAsync" />
 		<MudSpacer />
-		<MudTextField @bind-Value="_searchString" Placeholder="Поиск по ФИО, Должности или Статье затрат" Adornment="Adornment.Start" Immediate="true"
+		<MudTextField @bind-Value="_searchString" Placeholder="ФИО, Должность или Статья затрат" Adornment="Adornment.Start" Immediate="true"
 					  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Clearable="true"></MudTextField>
 		<MudSpacer />
 	</ToolBarContent>
 	<Columns>
-		<PropertyColumn Property="x => x.Name" Title="ФИО">
+		<PropertyColumn Property="x => x.Name" Title="ФИО" DragAndDropEnabled="false">
 			<EditTemplate>
 				<MudGrid style="min-width: 500px">
 					<MudItem xs="12">
